@@ -1,0 +1,8 @@
+-cp Source
+#-D analyzer-optimize
+# -debug
+-lib haxicord
+#-lib orm
+#-lib hscript
+-main Bot
+-neko artemis/bot.n
