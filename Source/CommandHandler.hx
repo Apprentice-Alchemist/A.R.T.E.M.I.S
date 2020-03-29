@@ -5,29 +5,31 @@ import commands.Command;
 import commands.*;
 
 class CommandHandler {
-	var bot:DiscordClient;
+	public static var bot:DiscordClient;
+	public static var instance:CommandHandler;
+	public static var commands:Map<String, Command> = new Map<String, Command>();
 
-	var commands:Map<String, Command> = new Map<String, Command>();
-
-	public function new(_bot) {
+	public static function init(_bot) {
 		bot = _bot;
-		addCommand("help", new Help(this));
+		addCommand("help",new Help());
 	}
 
-	private function addCommand(cname:String, cclass) {
+	public static function addCommand(cname:String, cclass) {
 		cname = cname.toLowerCase();
 		if (commands.exists(cname))
 			throw "Command " + cname + " set twice";
 		commands.set(cname, cclass);
 	}
-
-	public function handle(m:Message) {
+	public static function getCommands(){
+		return commands;
+	}
+	public static function handle(m:Message) {
 		if (m.content.substring(0, Bot.prefix.length) == Bot.prefix) {
 			for (coms in commands.keys()) {
 				if (m.content.substr(Bot.prefix.length, coms.length) == coms) {
 					commands.get(coms).call(m, bot);
-				}
+				}			
 			}
-		}
+		}	
 	}
 }

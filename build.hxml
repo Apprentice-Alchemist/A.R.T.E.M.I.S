@@ -1,8 +1,10 @@
 -cp Source
 #-D analyzer-optimize
 -debug
+-resource auth.json
 -lib haxicord
 #-lib orm
 #-lib hscript
 -main Bot
--neko bin/Haxibot-neko/bot.n
+-neko bin/neko/bot.n
+# -cmd neko bin/neko/bot.n

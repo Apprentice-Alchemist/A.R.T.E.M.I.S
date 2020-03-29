@@ -5,16 +5,24 @@ import com.raidandfade.haxicord.types.Message;
 
 class MessageHandler {
     var bot:DiscordClient;
-    var commandHandler:CommandHandler;
-    public function new(_bot:DiscordClient){bot = _bot; commandHandler = new CommandHandler(bot);}
+    public function new(_bot:DiscordClient){
+        bot = _bot;
+    }
 
-    public function handle(m:Message){
+    public static function handle(m:Message){
 		if(m.content.substring(0, Bot.prefix.length) == Bot.prefix){
-            commandHandler.handle(m);
+            CommandHandler.handle(m);
         } else {
-            handleMessage();
+            handleMessage(m);
         }
         
     }
-    public function handleMessage(){ trace('message handled');}
+    public static function handleMessage(m:Message){
+        var content = m.content;
+        if(StringTools.contains(content.toLowerCase(),"good bot")){
+            m.reply({content: "Thanks, I do my best!"});
+		} else if (StringTools.contains(content.toLowerCase(), "bad bot")){
+            m.reply({content: "Sorry, I'll do better next time."});
+        }
+    }
 }

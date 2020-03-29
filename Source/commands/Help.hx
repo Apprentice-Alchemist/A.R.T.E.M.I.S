@@ -2,10 +2,19 @@ package commands;
 import com.raidandfade.haxicord.DiscordClient;
 import com.raidandfade.haxicord.types.Message;
 class Help extends Command {
-    static var c:CommandHandler;
-    public function new(_c:CommandHandler){super(); c = _c;}
+    public var name = "Help";
+    override public function new(){
+        this.shorthelp = "shorthelp";
+        this.longhelp = "longhelp";
+        super();
+    }
 
-    override function call(m:Message, _bot:DiscordClient){
-        
+    public function _call(m:Message, _bot:DiscordClient){
+        var commands = CommandHandler.getCommands();
+        var stringBuf = new StringBuf();
+        for (o in commands.keys()){
+            stringBuf.add("\n"+ o + " : " + commands.get(o).shortHelp());
+        }
+        m.reply({embed: {title: "Available Commands",description: stringBuf.toString()}});
     }
 }
