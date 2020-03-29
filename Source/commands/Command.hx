@@ -17,6 +17,6 @@ class Command {
 	public function _call(m:Message,b:DiscordClient){}
 	public dynamic function call(_msg:Message, _bot:DiscordClient) {
 		_call(_msg,_bot);
-		trace("Command used : " + this.name);
+		trace("Command " + this.name + " used by : " + _msg.author.username);
 	}
 }

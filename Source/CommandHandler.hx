@@ -1,4 +1,6 @@
 package;
+import haxe.ds.EnumValueMap;
+import com.raidandfade.haxicord.endpoints.Endpoints.ErrorReport;
 import com.raidandfade.haxicord.DiscordClient;
 import com.raidandfade.haxicord.types.Message;
 import commands.Command;
@@ -13,6 +15,8 @@ class CommandHandler {
 		has_init = true;
 		bot = _bot;
 		addCommand("help",new Help());
+		// addCommand("eval", new Eval());
+		addCommand("kick",new Kick());
 	}
 
 	public static function addCommand(cname:String, cclass) {
@@ -37,9 +41,15 @@ class CommandHandler {
 		if (m.content.substring(0, Bot.prefix.length) == Bot.prefix) {
 			for (coms in commands.keys()) {
 				if (m.content.substr(Bot.prefix.length, coms.length) == coms) {
-					commands.get(coms).call(m, bot);
+					return commands.get(coms).call(m, bot);
 				}			
 			}
+			return m.reply({content: "No command found : " + m.content.substr(Bot.prefix.length,m.content.indexOf(" "))});
 		}	
+	}
+	public static function parseArgs(m:Message,n:String){
+		var tmp = m.content.substr(n.length + Bot.prefix.length);
+		var args = StringTools.htmlEscape(tmp,true).split('&quot');
+		return args;
 	}
 }

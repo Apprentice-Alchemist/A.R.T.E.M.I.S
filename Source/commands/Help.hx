@@ -8,7 +8,6 @@ class Help extends Command {
         this.longhelp = "longhelp";
         super();
     }
-
     public override function _call(m:Message, _bot:DiscordClient){
         var commands = CommandHandler.getCommands();
         var stringBuf = new StringBuf();

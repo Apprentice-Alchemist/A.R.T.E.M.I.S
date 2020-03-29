@@ -1,1 +1,1 @@
-worker neko bin/Haxibot.n
+worker neko bin/neko/bot.n

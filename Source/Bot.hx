@@ -24,8 +24,13 @@ class Bot {
 			trace("Guild Object Created For " + g.name + "(" + g.id.id + ")");
 		}
 		bot.onMemberJoin = onMemberJoin;
+		services.Modio.init();
+		haxe.Timer.delay(onDelay, 10000);
 	}	
+	public static function onDelay(){
 
+		haxe.Timer.delay(onDelay,10000);
+	}
 	public static function onReady() {
 		trace("My invite link is: " + bot.getInviteLink());
 		trace(Date.now().getTime() - startTime.getTime());
@@ -37,6 +42,13 @@ class Bot {
 			return JsonHandler.read("auth.json").token;
 		} else {
 			return Sys.getEnv("token").toString();
+		}
+	}
+	public static function getModioKey() {
+		if (JsonHandler.canRead("auth.json")) {
+			return JsonHandler.read("auth.json").modio_key;
+		} else {
+			return Sys.getEnv("modio_key").toString();
 		}
 	}
 }

@@ -3,6 +3,7 @@
 -debug
 -resource auth.json
 -lib haxicord
+-lib hscript
 #-lib orm
 #-lib hscript
 -main Bot
