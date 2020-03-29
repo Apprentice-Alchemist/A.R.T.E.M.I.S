@@ -21,8 +21,11 @@ class MessageHandler {
         var content = m.content;
         if(StringTools.contains(content.toLowerCase(),"good bot")){
             m.reply({content: "Thanks, I do my best!"});
+            trace("message handled");
 		} else if (StringTools.contains(content.toLowerCase(), "bad bot")){
             m.reply({content: "Sorry, I'll do better next time."});
+			trace("message handled");
         }
+		trace("message handled");
     }
 }
