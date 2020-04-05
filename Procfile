@@ -1,1 +1,1 @@
-worker neko bin/neko/bot.n
+worker: node bin/node/bot.js
