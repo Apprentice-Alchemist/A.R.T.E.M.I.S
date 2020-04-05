@@ -5,7 +5,6 @@
 -lib haxicord
 -lib hscript
 #-lib orm
-#-lib hscript
 -main Bot
 -neko bin/neko/bot.n
 # -cmd neko bin/neko/bot.n

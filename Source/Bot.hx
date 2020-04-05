@@ -24,7 +24,7 @@ class Bot {
 			trace("Guild Object Created For " + g.name + "(" + g.id.id + ")");
 		}
 		bot.onMemberJoin = onMemberJoin;
-		services.Modio.init();
+		// services.Modio.init();
 		haxe.Timer.delay(onDelay, 10000);
 	}	
 	public static function onDelay(){
