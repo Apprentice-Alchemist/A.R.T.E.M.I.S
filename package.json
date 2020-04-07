@@ -1,0 +1,8 @@
+{
+    "devDependencies": {
+        "nodemon": "^1.11.0"
+    },
+    "scripts": {
+        "start": "nodemon bin/node/bot.js --ignore '*.json'"
+    }
+}
