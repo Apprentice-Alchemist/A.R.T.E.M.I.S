@@ -15,11 +15,11 @@ Bot.__name__ = true;
 Bot.main = function() {
 	Bot.startTime = new Date();
 	Bot.bot = new com_raidandfade_haxicord_DiscordClient(Bot.getToken());
-	haxe_Log.trace(Bot.getToken() != null,{ fileName : "Source/Bot.hx", lineNumber : 20, className : "Bot", methodName : "main"});
+	haxe_Log.trace(Bot.getToken() != null,{ fileName : "Source/Bot.hx", lineNumber : 16, className : "Bot", methodName : "main"});
 	Bot.bot.onReady = Bot.onReady;
 	Bot.bot.onMessage = MessageHandler.handle;
 	Bot.bot.onGuildCreate = function(g) {
-		haxe_Log.trace("Guild Object Created For " + g.name + "(" + g.id.id + ")",{ fileName : "Source/Bot.hx", lineNumber : 24, className : "Bot", methodName : "main"});
+		haxe_Log.trace("Guild Object Created For " + g.name + "(" + g.id.id + ")",{ fileName : "Source/Bot.hx", lineNumber : 20, className : "Bot", methodName : "main"});
 	};
 	Bot.bot.onMemberJoin = Bot.onMemberJoin;
 	haxe_Timer.delay(Bot.onDelay,10000);
@@ -28,8 +28,8 @@ Bot.onDelay = function() {
 	haxe_Timer.delay(Bot.onDelay,10000);
 };
 Bot.onReady = function() {
-	haxe_Log.trace("My invite link is: " + Bot.bot.getInviteLink(),{ fileName : "Source/Bot.hx", lineNumber : 35, className : "Bot", methodName : "onReady"});
-	haxe_Log.trace(new Date().getTime() - Bot.startTime.getTime(),{ fileName : "Source/Bot.hx", lineNumber : 36, className : "Bot", methodName : "onReady"});
+	haxe_Log.trace("My invite link is: " + Bot.bot.getInviteLink(),{ fileName : "Source/Bot.hx", lineNumber : 31, className : "Bot", methodName : "onReady"});
+	haxe_Log.trace(new Date().getTime() - Bot.startTime.getTime(),{ fileName : "Source/Bot.hx", lineNumber : 32, className : "Bot", methodName : "onReady"});
 };
 Bot.onMemberJoin = function(g,m) {
 };
@@ -307,20 +307,27 @@ MessageHandler.__name__ = true;
 MessageHandler.handle = function(m) {
 	if(m.content.substring(0,Bot.prefix.length) == Bot.prefix) {
 		CommandHandler.handle(m);
+		return;
 	} else {
-		MessageHandler.handleMessage(m);
+		return;
 	}
 };
 MessageHandler.handleMessage = function(m) {
 	var content = m.content;
 	if(content.toLowerCase().indexOf("good bot") != -1) {
 		m.reply({ content : "Thanks, I do my best!"});
-		haxe_Log.trace("message handled",{ fileName : "Source/MessageHandler.hx", lineNumber : 24, className : "MessageHandler", methodName : "handleMessage"});
+		haxe_Log.trace("message handled",{ fileName : "Source/MessageHandler.hx", lineNumber : 26, className : "MessageHandler", methodName : "handleMessage"});
+		return true;
 	} else if(content.toLowerCase().indexOf("bad bot") != -1) {
 		m.reply({ content : "Sorry, I'll do better next time."});
-		haxe_Log.trace("message handled",{ fileName : "Source/MessageHandler.hx", lineNumber : 27, className : "MessageHandler", methodName : "handleMessage"});
+		haxe_Log.trace("message handled",{ fileName : "Source/MessageHandler.hx", lineNumber : 30, className : "MessageHandler", methodName : "handleMessage"});
+		return true;
+	} else if(m.mentions.lastIndexOf(Bot.bot.user) != null) {
+		m.reply({ content : "Hello, did you call me? If you want to know what I can do type `]help`!"});
+		return true;
 	}
-	haxe_Log.trace("message handled",{ fileName : "Source/MessageHandler.hx", lineNumber : 29, className : "MessageHandler", methodName : "handleMessage"});
+	haxe_Log.trace("message handled",{ fileName : "Source/MessageHandler.hx", lineNumber : 36, className : "MessageHandler", methodName : "handleMessage"});
+	return false;
 };
 MessageHandler.prototype = {
 	__class__: MessageHandler

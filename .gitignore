@@ -2,3 +2,5 @@
 auth.json
 *.json
 node_modules/*
+csharp.hxml
+libs/*

@@ -1,12 +1,8 @@
 package;
-
 import haxe.Timer;
 import com.raidandfade.haxicord.types.Guild;
 import com.raidandfade.haxicord.types.GuildMember;
-import com.raidandfade.haxicord.types.Message;
 import com.raidandfade.haxicord.DiscordClient;
-import MessageHandler;
-import CommandHandler;
 
 class Bot {
 	public static var bot:DiscordClient;
