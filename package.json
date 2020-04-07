@@ -1,2 +1,8 @@
 {
+    "name": "Artemis",
+    "description": "A discord bot",
+    "version": "0.0.1",
+    "engines": {
+        "node": "12.x"
+    }
 }
