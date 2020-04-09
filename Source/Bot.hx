@@ -1,4 +1,5 @@
 package;
+import services.Modio;
 import haxe.Timer;
 import com.raidandfade.haxicord.types.Guild;
 import com.raidandfade.haxicord.types.GuildMember;
@@ -20,7 +21,8 @@ class Bot {
 			trace("Guild Object Created For " + g.name + "(" + g.id.id + ")");
 		}
 		bot.onMemberJoin = onMemberJoin;
-		// services.Modio.init();
+		Modio.init();
+		Modio.getMods();
 		haxe.Timer.delay(onDelay, 10000);
 	}	
 	public static function onDelay(){

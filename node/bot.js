@@ -15,21 +15,23 @@ Bot.__name__ = true;
 Bot.main = function() {
 	Bot.startTime = new Date();
 	Bot.bot = new com_raidandfade_haxicord_DiscordClient(Bot.getToken());
-	haxe_Log.trace(Bot.getToken() != null,{ fileName : "Source/Bot.hx", lineNumber : 16, className : "Bot", methodName : "main"});
+	haxe_Log.trace(Bot.getToken() != null,{ fileName : "Source/Bot.hx", lineNumber : 17, className : "Bot", methodName : "main"});
 	Bot.bot.onReady = Bot.onReady;
 	Bot.bot.onMessage = MessageHandler.handle;
 	Bot.bot.onGuildCreate = function(g) {
-		haxe_Log.trace("Guild Object Created For " + g.name + "(" + g.id.id + ")",{ fileName : "Source/Bot.hx", lineNumber : 20, className : "Bot", methodName : "main"});
+		haxe_Log.trace("Guild Object Created For " + g.name + "(" + g.id.id + ")",{ fileName : "Source/Bot.hx", lineNumber : 21, className : "Bot", methodName : "main"});
 	};
 	Bot.bot.onMemberJoin = Bot.onMemberJoin;
+	services_Modio.init();
+	services_Modio.getMods();
 	haxe_Timer.delay(Bot.onDelay,10000);
 };
 Bot.onDelay = function() {
 	haxe_Timer.delay(Bot.onDelay,10000);
 };
 Bot.onReady = function() {
-	haxe_Log.trace("My invite link is: " + Bot.bot.getInviteLink(),{ fileName : "Source/Bot.hx", lineNumber : 31, className : "Bot", methodName : "onReady"});
-	haxe_Log.trace(new Date().getTime() - Bot.startTime.getTime(),{ fileName : "Source/Bot.hx", lineNumber : 32, className : "Bot", methodName : "onReady"});
+	haxe_Log.trace("My invite link is: " + Bot.bot.getInviteLink(),{ fileName : "Source/Bot.hx", lineNumber : 33, className : "Bot", methodName : "onReady"});
+	haxe_Log.trace(new Date().getTime() - Bot.startTime.getTime(),{ fileName : "Source/Bot.hx", lineNumber : 34, className : "Bot", methodName : "onReady"});
 };
 Bot.onMemberJoin = function(g,m) {
 };
@@ -96,8 +98,8 @@ CommandHandler.handle = function(m) {
 	}
 };
 CommandHandler.parseArgs = function(m,n) {
-	var tmp = HxOverrides.substr(m.content,n.length + Bot.prefix.length,null);
-	var args = StringTools.htmlEscape(tmp,true).split("&quot");
+	var tmp = HxOverrides.substr(m.content,m.content.indexOf(" "),null);
+	var args = tmp.split("\" \"");
 	return args;
 };
 var DateTools = function() { };
@@ -388,52 +390,6 @@ StringBuf.prototype = {
 };
 var StringTools = function() { };
 StringTools.__name__ = true;
-StringTools.htmlEscape = function(s,quotes) {
-	var buf_b = "";
-	var _g_offset = 0;
-	var _g_s = s;
-	while(_g_offset < _g_s.length) {
-		var s1 = _g_s;
-		var index = _g_offset++;
-		var c = s1.charCodeAt(index);
-		if(c >= 55296 && c <= 56319) {
-			c = c - 55232 << 10 | s1.charCodeAt(index + 1) & 1023;
-		}
-		var c1 = c;
-		if(c1 >= 65536) {
-			++_g_offset;
-		}
-		var code = c1;
-		switch(code) {
-		case 34:
-			if(quotes) {
-				buf_b += "&quot;";
-			} else {
-				buf_b += String.fromCodePoint(code);
-			}
-			break;
-		case 38:
-			buf_b += "&amp;";
-			break;
-		case 39:
-			if(quotes) {
-				buf_b += "&#039;";
-			} else {
-				buf_b += String.fromCodePoint(code);
-			}
-			break;
-		case 60:
-			buf_b += "&lt;";
-			break;
-		case 62:
-			buf_b += "&gt;";
-			break;
-		default:
-			buf_b += String.fromCodePoint(code);
-		}
-	}
-	return buf_b;
-};
 StringTools.isSpace = function(s,pos) {
 	var c = HxOverrides.cca(s,pos);
 	if(!(c > 8 && c < 14)) {
@@ -576,7 +532,7 @@ var com_raidandfade_haxicord_DiscordClient = $hx_exports["com"]["raidandfade"]["
 	} else {
 		this.dataCache = _storage;
 	}
-	haxe_Log.trace("Starting Client",{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 155, className : "com.raidandfade.haxicord.DiscordClient", methodName : "new"});
+	haxe_Log.trace("Starting Client",{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 149, className : "com.raidandfade.haxicord.DiscordClient", methodName : "new"});
 	this.endpoints.getGateway(this.isBot,$bind(this,this.connect));
 	haxe_MainLoop.add($bind(this,this.tick));
 };
@@ -589,7 +545,7 @@ com_raidandfade_haxicord_DiscordClient.prototype = {
 	,connect: function(gateway,error) {
 		var _gthis = this;
 		try {
-			haxe_Log.trace("Connecting",{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 176, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
+			haxe_Log.trace("Connecting",{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 170, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
 			if(error != null) {
 				throw js__$Boot_HaxeError.wrap(error);
 			}
@@ -614,24 +570,17 @@ com_raidandfade_haxicord_DiscordClient.prototype = {
 				if(_gthis.session == "") {
 					_gthis.resumeable = false;
 				}
-				haxe_Log.trace("Socket Closed with code " + m + ", Re-Opening in " + _gthis.reconnectTimeout + "s. " + (_gthis.resumeable ? "Resuming" : ""),{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 205, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
-				var f = $bind(_gthis,_gthis.connect);
-				var gateway1 = gateway;
-				var error1 = error;
-				haxe_Timer.delay(function() {
-					f(gateway1,error1);
-					return;
-				},_gthis.reconnectTimeout * 1000);
-				_gthis.reconnectTimeout = Math.floor(Math.min(_gthis.reconnectTimeout * 2,300));
+				haxe_Log.trace("Socket Closed with code " + m + ", Re-Opening in " + _gthis.reconnectTimeout + "s. " + (_gthis.resumeable ? "Resuming" : ""),{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 201, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
+				Bot.main();
 			};
 			this.ws.onError = function(e) {
 				_gthis.resumeable = false;
-				haxe_Log.trace("Websocket errored!",{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 214, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
-				haxe_Log.trace(e,{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 215, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
+				haxe_Log.trace("Websocket errored!",{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 211, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
+				haxe_Log.trace(e,{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 212, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
 			};
 		} catch( e1 ) {
 			haxe_CallStack.lastException = e1;
-			haxe_Log.trace(((e1) instanceof js__$Boot_HaxeError) ? e1.val : e1,{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 218, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
+			haxe_Log.trace(((e1) instanceof js__$Boot_HaxeError) ? e1.val : e1,{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 215, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
 		}
 	}
 	,sendWs: function(d) {
@@ -652,7 +601,7 @@ com_raidandfade_haxicord_DiscordClient.prototype = {
 				this.receiveEvent(m);
 				break;
 			case 9:
-				haxe_Log.trace("Session was invalidated, killing.",{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 254, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
+				haxe_Log.trace("Session was invalidated, killing.",{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 251, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
 				this.resumeable = !m.d;
 				this.ws.close();
 				break;
@@ -677,8 +626,8 @@ com_raidandfade_haxicord_DiscordClient.prototype = {
 		} catch( er ) {
 			haxe_CallStack.lastException = er;
 			var er1 = ((er) instanceof js__$Boot_HaxeError) ? er.val : er;
-			haxe_Log.trace("UNCAUGHT ERROR IN EVENT CALLBACK.",{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 263, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
-			haxe_Log.trace(Std.string(er1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 264, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
+			haxe_Log.trace("UNCAUGHT ERROR IN EVENT CALLBACK.",{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 260, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
+			haxe_Log.trace(Std.string(er1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 261, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
 		}
 	}
 	,receiveEvent: function(m) {
@@ -897,7 +846,7 @@ com_raidandfade_haxicord_DiscordClient.prototype = {
 		case "WEBHOOKS_UPDATE":
 			break;
 		default:
-			haxe_Log.trace("Unhandled event " + m.t,{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 429, className : "com.raidandfade.haxicord.DiscordClient", methodName : "receiveEvent"});
+			haxe_Log.trace("Unhandled event " + m.t,{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 430, className : "com.raidandfade.haxicord.DiscordClient", methodName : "receiveEvent"});
 		}
 	}
 	,setStatus: function(status) {
@@ -2317,9 +2266,9 @@ com_raidandfade_haxicord_endpoints_Endpoints.prototype = {
 				tmp.remaining--;
 			}
 		} else {
-			var this2 = this.rateLimitCache;
+			var this11 = this.rateLimitCache;
 			var value1 = new com_raidandfade_haxicord_endpoints_RateLimit(1,0,-1);
-			var _this7 = this2;
+			var _this7 = this11;
 			if(__map_reserved[rateLimitName] != null) {
 				_this7.setReserved(rateLimitName,value1);
 			} else {
@@ -2348,9 +2297,9 @@ com_raidandfade_haxicord_endpoints_Endpoints.prototype = {
 						result[i] = _this12[i];
 					}
 					var arrCopy = result;
-					var this3 = _gthis.limitedQueue;
+					var this12 = _gthis.limitedQueue;
 					var value2 = [];
-					var _this13 = this3;
+					var _this13 = this12;
 					if(__map_reserved[rateLimitName1] != null) {
 						_this13.setReserved(rateLimitName1,value2);
 					} else {
@@ -2380,9 +2329,9 @@ com_raidandfade_haxicord_endpoints_Endpoints.prototype = {
 				var limit = Std.parseInt(__map_reserved["x-ratelimit-limit"] != null ? headers.getReserved("x-ratelimit-limit") : headers.h["x-ratelimit-limit"]);
 				var remaining = Std.parseInt(__map_reserved["x-ratelimit-remaining"] != null ? headers.getReserved("x-ratelimit-remaining") : headers.h["x-ratelimit-remaining"]);
 				var reset = parseFloat(__map_reserved["x-ratelimit-reset"] != null ? headers.getReserved("x-ratelimit-reset") : headers.h["x-ratelimit-reset"]);
-				var this4 = _gthis.rateLimitCache;
+				var this13 = _gthis.rateLimitCache;
 				var value3 = new com_raidandfade_haxicord_endpoints_RateLimit(limit,remaining,reset);
-				var _this14 = this4;
+				var _this14 = this13;
 				if(__map_reserved[rateLimitName] != null) {
 					_this14.setReserved(rateLimitName,value3);
 				} else {
@@ -2391,9 +2340,9 @@ com_raidandfade_haxicord_endpoints_Endpoints.prototype = {
 				if(remaining == 0) {
 					var delay = (reset - new Date().getTime() / 1000 | 0) * 1000 + 500;
 					var waitForLimit = function(rateLimitName2,rateLimit) {
-						var this5 = _gthis.rateLimitCache;
+						var this14 = _gthis.rateLimitCache;
 						var value4 = new com_raidandfade_haxicord_endpoints_RateLimit(limit,limit,-1);
-						var _this15 = this5;
+						var _this15 = this14;
 						if(__map_reserved[rateLimitName2] != null) {
 							_this15.setReserved(rateLimitName2,value4);
 						} else {
@@ -2417,9 +2366,9 @@ com_raidandfade_haxicord_endpoints_Endpoints.prototype = {
 					}
 				}
 			} else {
-				var this6 = _gthis.rateLimitCache;
+				var this15 = _gthis.rateLimitCache;
 				var value5 = new com_raidandfade_haxicord_endpoints_RateLimit(50,50,-1);
-				var _this18 = this6;
+				var _this18 = this15;
 				if(__map_reserved[rateLimitName] != null) {
 					_this18.setReserved(rateLimitName,value5);
 				} else {
@@ -4348,7 +4297,7 @@ com_raidandfade_haxicord_websocket_WebSocketConnection.__name__ = true;
 com_raidandfade_haxicord_websocket_WebSocketConnection.prototype = {
 	create: function() {
 		var _gthis = this;
-		haxe_Log.trace("starting",{ fileName : "com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 75, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "create"});
+		haxe_Log.trace("starting",{ fileName : "Source/com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 67, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "create"});
 		com_raidandfade_haxicord_websocket_WebSocketConnection.ws = haxe_net_WebSocket.create(com_raidandfade_haxicord_websocket_WebSocketConnection.host,[],null,false);
 		com_raidandfade_haxicord_websocket_WebSocketConnection.ws.onopen = function() {
 			_gthis.ready = true;
@@ -4393,7 +4342,7 @@ com_raidandfade_haxicord_websocket_WebSocketConnection.prototype = {
 				});
 			} catch( e ) {
 				haxe_CallStack.lastException = e;
-				haxe_Log.trace(Std.string(((e) instanceof js__$Boot_HaxeError) ? e.val : e) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 133, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "create"});
+				haxe_Log.trace(Std.string(((e) instanceof js__$Boot_HaxeError) ? e.val : e) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Source/com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 125, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "create"});
 			}
 		};
 		com_raidandfade_haxicord_websocket_WebSocketConnection.ws.onerror = $bind(this,this.onError);
@@ -4414,7 +4363,7 @@ com_raidandfade_haxicord_websocket_WebSocketConnection.prototype = {
 	}
 	,_onClose: function(m) {
 		this.ready = false;
-		haxe_Log.trace("died",{ fileName : "com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 185, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "_onClose"});
+		haxe_Log.trace("died",{ fileName : "Source/com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 171, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "_onClose"});
 		this.onClose(m);
 	}
 	,onClose: function(m) {
@@ -5467,6 +5416,13 @@ js_node_url__$URLSearchParams_URLSearchParamsEntry_$Impl_$.get_name = function(t
 js_node_url__$URLSearchParams_URLSearchParamsEntry_$Impl_$.get_value = function(this1) {
 	return this1[1];
 };
+var services_Modio = function() { };
+services_Modio.__name__ = true;
+services_Modio.init = function() {
+	services_Modio.apikey = Bot.getModioKey();
+};
+services_Modio.getMods = function() {
+};
 var services_UserService = function() { };
 services_UserService.__name__ = true;
 services_UserService.getPerms = function(u,s) {
@@ -5681,6 +5637,7 @@ com_raidandfade_haxicord_websocket_WebSocketConnection.ZLIB_SUFFIX = "0000ffff";
 com_raidandfade_haxicord_websocket_WebSocketConnection.BUFFER_SIZE = 1048576;
 haxe_EntryPoint.pending = [];
 haxe_EntryPoint.threadCount = 0;
+services_Modio.game_id = 34;
 {
 	Bot.main();
 	haxe_EntryPoint.run();

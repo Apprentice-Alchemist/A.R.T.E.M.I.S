@@ -1,10 +1,12 @@
--cp Source
-#-D analyzer-optimize
 -debug
 -resource auth.json
+# Libs
 -lib haxicord
 -lib hscript
-#-lib orm
+-lib hxnodejs
+# stuff
+-cp Source 
 -main Bot
--neko bin/neko/bot.n
-# -cmd neko bin/neko/bot.n
+-D nodejs
+# output
+-js node/bot.js

@@ -48,8 +48,8 @@ class CommandHandler {
 		}	
 	}
 	public static function parseArgs(m:Message,n:String){
-		var tmp = m.content.substr(n.length + Bot.prefix.length);
-		var args = StringTools.htmlEscape(tmp,true).split('&quot');
+		var tmp = m.content.substr(m.content.indexOf(" "));
+		var args = tmp.split('" "');
 		return args;
 	}
 }
