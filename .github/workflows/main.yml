@@ -1,0 +1,21 @@
+name: Heroku
+
+on:
+  push:
+    branches: [master]
+  repository_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+    - uses: krdlab/setup-haxe@v1.1.2
+    - run: haxelib install hxnodejs
+    - run: haxelib install haxicord    
+    - run: npm install
+    - run: haxe build.hxml
+    - run: git remote add heroku https://git.heroku.com/artemis-discord-bot.git
+    - run: git push heroku master
