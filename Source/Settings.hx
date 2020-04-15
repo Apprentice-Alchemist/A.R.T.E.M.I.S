@@ -1,0 +1,1 @@
+typedef Settings = lib.Settings;

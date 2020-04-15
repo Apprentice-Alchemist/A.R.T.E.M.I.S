@@ -204,7 +204,8 @@ class DiscordClient {
 				// this.reconnectTimeout = Math.floor(Math.min(this.reconnectTimeout * 2, 300)); // double until 300s (5m)
 				this.session = "";
 				resumeable = false;
-                Bot.main();
+				Bot.bot = null;
+                haxe.Timer.delay(Bot.main,100);
 			}
 
 			ws.onError = function(e) {

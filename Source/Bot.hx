@@ -14,37 +14,36 @@ class Bot {
 	public static function main() {
 		startTime = Date.now();
 		bot = new DiscordClient(getToken());
-		trace(getToken() != null);
 		bot.onReady = onReady;
 		bot.onMessage = MessageHandler.handle;
-		bot.onGuildCreate = function(g) {
-			trace("Guild Object Created For " + g.name + "(" + g.id.id + ")");
-		}
+		bot.onGuildCreate = function(g) {}
 		bot.onMemberJoin = onMemberJoin;
+		// bot.setStatus({status: "online"});
 		Modio.init();
-		Modio.getMods();
-		haxe.Timer.delay(onDelay, 10000);
+		onDelay();
+		
 	}	
 	public static function onDelay(){
-
+		trace(Modio.getMods());
 		haxe.Timer.delay(onDelay,10000);
 	}
+	public function tick(){}
 	public static function onReady() {
 		trace("My invite link is: " + bot.getInviteLink());
 		trace(Date.now().getTime() - startTime.getTime());
+		BotError.sendErrors();
 	}
-
 	public static function onMemberJoin(g:Guild, m:GuildMember) {}
 	public static function getToken(){
-		if (JsonHandler.canRead("auth.json")){
-			return JsonHandler.read("auth.json").token;
+		if (lib.JsonHandler.canRead("auth.json")){
+			return lib.JsonHandler.read("auth.json").token;
 		} else {
 			return Sys.getEnv("token").toString();
 		}
 	}
 	public static function getModioKey() {
-		if (JsonHandler.canRead("auth.json")) {
-			return JsonHandler.read("auth.json").modio_key;
+		if (lib.JsonHandler.canRead("auth.json")) {
+			return lib.JsonHandler.read("auth.json").modio_key;
 		} else {
 			return Sys.getEnv("modio_key").toString();
 		}
