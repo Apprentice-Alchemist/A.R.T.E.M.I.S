@@ -14,7 +14,9 @@ jobs:
         haxe-version: 4.0.5
     - name: Build
       run: |
-        haxelib install build.hxml -y
+        haxelib install hscript
+        haxelib install hxnodejs
+        haxelib install haxicord
         haxe build.hxml
     # - name: Deploy
     #   uses: akhileshns/heroku-deploy@v3.0.4

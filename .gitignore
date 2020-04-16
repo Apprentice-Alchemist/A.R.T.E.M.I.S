@@ -5,4 +5,5 @@ node_modules/*
 csharp.hxml
 libs/*
 bin/*
-node/*
+*.js
+*.map
