@@ -16,6 +16,7 @@ jobs:
       run: |
         mkdir $GITHUB_WORKSPACE/.haxelib
         haxelib setup $GITHUB_WORKSPACE/.haxelib
+        haxelib --quiet
         haxelib install hscript
         haxelib install hxnodejs
         haxelib install haxicord
