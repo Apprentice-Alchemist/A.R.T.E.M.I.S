@@ -1,12 +1,10 @@
 -debug
 -resource auth.json
-# Libs
 -lib haxicord
 -lib hscript
 -lib hxnodejs
-# stuff
 -cp Source 
 -main Bot
 -D nodejs
-# output
 -js node/bot.js
+# -cmd haxe --run Build

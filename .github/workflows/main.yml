@@ -1,4 +1,4 @@
-name: Heroku
+name: Build and Deploy
 
 on:
   push:
@@ -10,12 +10,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      with:
-        persist-credentials: false
     - uses: krdlab/setup-haxe@v1.1.2
     - run: haxelib install hxnodejs
-    - run: haxelib install haxicord    
-    - run: npm install
-    - run: haxe build.hxml
-    - run: git remote add heroku https://git.heroku.com/artemis-discord-bot.git
-    - run: git push heroku master
+    - run: haxelib install haxicord
+    - run: haxe --run Build
+
+    - name: Deploy to Heroku
+      uses: akhileshns/heroku-deploy@v3.0.4
+       with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: ${{secrets.HEROKU_APP}}
+        heroku_email: ${{secrets.HEROKU_EMAIL}}
+        appdir: "node"
+
+    # - name: Notify Discord (success)
+    #   uses: appleboy/discord-action@master
+    #   with:
+    #     webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+    #     webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+    #     color: "#00C07F"
+    #     message: "Build and Deploy succeeded!"
+
+    # - name: Notify Discord (failure)
+    #   uses: appleboy/discord-action@master
+    #   if: failure()
+    #   with:
+    #     webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+    #     webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+    #     color: "#FF6562"
+    #     message: "Build and or Deploy failed."
