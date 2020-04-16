@@ -5,7 +5,6 @@ import sys.io.File;
 import haxe.Json;
 
 class JsonHandler {
-    @:dox(hide)
     public static inline function canRead(file:String){
         return FileSystem.exists(file);
     }
