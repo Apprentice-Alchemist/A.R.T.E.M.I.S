@@ -15,7 +15,7 @@ jobs:
     - run: haxe --run Build
 
     - name: Deploy to Heroku
-      uses: akhileshns/heroku-deploy@v3.0.4
+    - uses: akhileshns/heroku-deploy@v3.0.4
        with:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: ${{secrets.HEROKU_APP}}
