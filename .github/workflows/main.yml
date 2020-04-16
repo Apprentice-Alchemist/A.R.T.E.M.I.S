@@ -21,13 +21,13 @@ jobs:
         haxelib install haxicord > dev/null
         haxe -version
         haxe --library hscript --library hxnodejs --library haxicord --class-path Source --main Bot --js node/bot.js -D nodejs --debug
-    # - name: Deploy
-    #   uses: akhileshns/heroku-deploy@v3.0.4
-    #   with:
-    #     heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-    #     heroku_app_name: ${{secrets.HEROKU_APP}}
-    #     heroku_email: ${{secrets.HEROKU_EMAIL}}
-    #     appdir: "node"
+    - name: Deploy
+      uses: akhileshns/heroku-deploy@v3.0.4
+      with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: ${{secrets.HEROKU_APP}}
+        heroku_email: ${{secrets.HEROKU_EMAIL}}
+        appdir: "node"
 
     # - name: Notify Discord (success)
     #   uses: appleboy/discord-action@master
