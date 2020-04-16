@@ -14,11 +14,13 @@ jobs:
         haxe-version: 4.0.5
     - name: Build
       run: |
+        mkdir $GITHUB_WORKSPACE/.haxelib
+        haxelib setup $GITHUB_WORKSPACE/.haxelib
         haxelib install hscript
         haxelib install hxnodejs
         haxelib install haxicord
         haxe -version
-    #   haxe --library hscript --library hxnodejs --library haxicord --class-path Source --main Bot --js node/bot.js -D nodejs --debug
+        haxe --library hscript --library hxnodejs --library haxicord --class-path Source --main Bot --js node/bot.js -D nodejs --debug
     # - name: Deploy
     #   uses: akhileshns/heroku-deploy@v3.0.4
     #   with:
