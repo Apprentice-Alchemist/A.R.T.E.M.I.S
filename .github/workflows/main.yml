@@ -13,7 +13,9 @@ jobs:
       with:
         haxe-version: 4.0.5
     - name: Build
-      run: haxe --run Build
+      run: |
+        haxelib build.hxml
+        haxe build.hxml
     # - name: Deploy
     #   uses: akhileshns/heroku-deploy@v3.0.4
     #   with:
