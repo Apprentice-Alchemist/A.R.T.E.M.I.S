@@ -7,4 +7,4 @@
 -main Bot
 -D nodejs
 -js node/bot.js
--cmd haxe --run Build
+# -cmd haxe --run Build
