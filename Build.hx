@@ -40,6 +40,7 @@ class Build {
 	}
 
     public static function main(){
+        Sys.command("haxelib build.hxml");
         Sys.command("haxe build.hxml");
         File.write("node/Procfile").writeString("worker: node bot.js");
         File.write("node/package.json").writeString(Json.stringify(packageJson));
