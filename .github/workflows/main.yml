@@ -17,7 +17,7 @@ jobs:
         haxelib install hscript
         haxelib install hxnodejs
         haxelib install haxicord
-        haxe build.hxml
+    #   haxe build.hxml
     # - name: Deploy
     #   uses: akhileshns/heroku-deploy@v3.0.4
     #   with:
