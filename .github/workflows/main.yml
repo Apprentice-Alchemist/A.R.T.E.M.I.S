@@ -19,12 +19,12 @@ jobs:
         haxelib setup $GITHUB_WORKSPACE/.haxelib
         haxelib install hscript --quiet
         haxelib install hxnodejs --quiet
-        haxelib git https://github.com/RaidAndFade/Haxicord
-        haxelib dev haxicord haxicord
+        haxelib install Haxicord --quiet
+        haxelib list
     - name: Build
-      run: |
-        haxe build.hxml
-        haxe --run Build
+      # run: |
+      # #  haxe build.hxml
+      # #  haxe --run Build
     - name: Deploy
       uses: akhileshns/heroku-deploy@v3.0.4
       with:
