@@ -1,5 +1,5 @@
 -debug
--resource auth.json
+# -resource auth.json
 -lib haxicord
 -lib hscript
 -lib hxnodejs
