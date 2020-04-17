@@ -19,7 +19,8 @@ jobs:
         haxelib setup $GITHUB_WORKSPACE/.haxelib
         haxelib install hscript --quiet
         haxelib install hxnodejs --quiet
-        haxelib install haxicord --quiet
+        haxelib git https://github.com/RaidAndFade/Haxicord
+        haxelib dev haxicord haxicord
     - name: Build
       run: |
         haxe build.hxml
