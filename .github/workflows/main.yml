@@ -22,9 +22,9 @@ jobs:
         haxelib install Haxicord --quiet
         haxelib list
     - name: Build
-      # run: |
-      # #  haxe build.hxml
-      # #  haxe --run Build
+      run: |
+       haxe build.hxml
+       haxe --run Build
     - name: Deploy
       uses: akhileshns/heroku-deploy@v3.0.4
       with:
