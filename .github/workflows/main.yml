@@ -31,7 +31,7 @@ jobs:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: ${{secrets.HEROKU_APP}}
         heroku_email: ${{secrets.HEROKU_EMAIL}}
-        appdir: "node/"
+        appdir: "node"
 
     # - name: Notify Discord (success)
     #   uses: appleboy/discord-action@master
