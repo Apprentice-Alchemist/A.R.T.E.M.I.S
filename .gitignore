@@ -1,9 +1,3 @@
-*.env
 auth.json
-*.bin
 node_modules/*
-csharp.hxml
 libs/*
-bin/*
-*.js
-*.map

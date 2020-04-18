@@ -1,5 +1,5 @@
 -debug
-# -resource auth.json
+-resource auth.json
 -lib Haxicord
 -lib hscript
 -lib hxnodejs
@@ -7,4 +7,4 @@
 -main Bot
 -D nodejs
 -js node/bot.js
-# -cmd haxe --run Build
+-cmd haxe --run Build
