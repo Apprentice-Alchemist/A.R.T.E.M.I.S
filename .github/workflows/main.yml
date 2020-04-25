@@ -9,43 +9,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2  
-    # - name: Setup    
-    #   uses: krdlab/setup-haxe@master
-    #   with:
-    #       haxe-version: 4.0.5
-    # - name: Haxelib
-    #   run: |
-    #     mkdir $GITHUB_WORKSPACE/.haxelib
-    #     haxelib setup $GITHUB_WORKSPACE/.haxelib
-    #     haxelib install hscript --quiet
-    #     haxelib install hxnodejs --quiet
-    #     haxelib install Haxicord --quiet
-    #     haxelib list
-    # - name: Build
-    #   run: |
-    #    haxe build.hxml
-    #    haxe --run Build
+    - name: Setup    
+      uses: krdlab/setup-haxe@master
+      with:
+          haxe-version: 4.0.5
+    - name: Haxelib
+      run: |
+        mkdir $GITHUB_WORKSPACE/.haxelib
+        haxelib setup $GITHUB_WORKSPACE/.haxelib
+        haxelib install hscript --quiet
+        haxelib install hxnodejs --quiet
+        haxelib install Haxicord --quiet
+        haxelib list
+    - name: Build
+      run: |
+       haxe build.hxml
+       haxe --run Build
     - name: Deploy
-      uses: akhileshns/heroku-deploy@v3.0.4
+      uses: apprentice-alchemist/heroku-deploy@master
       with:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: ${{secrets.HEROKU_APP}}
         heroku_email: ${{secrets.HEROKU_EMAIL}}
         appdir: "node"
+    - name: Notify Discord (success)
+      uses: appleboy/discord-action@master
+      with:
+        webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+        webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+        color: "#00C07F"
+        message: "Build and Deploy succeeded!"
 
-    # - name: Notify Discord (success)
-    #   uses: appleboy/discord-action@master
-    #   with:
-    #     webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
-    #     webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-    #     color: "#00C07F"
-    #     message: "Build and Deploy succeeded!"
-
-    # - name: Notify Discord (failure)
-    #   uses: appleboy/discord-action@master
-    #   if: failure()
-    #   with:
-    #     webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
-    #     webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-    #     color: "#FF6562"
-    #     message: "Build and or Deploy failed."
+    - name: Notify Discord (failure)
+      uses: appleboy/discord-action@master
+      if: failure()
+      with:
+        webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+        webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+        color: "#FF6562"
+        message: "Build and or Deploy failed."
