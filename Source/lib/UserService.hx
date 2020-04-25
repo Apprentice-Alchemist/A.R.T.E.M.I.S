@@ -1,4 +1,4 @@
-package services;
+package lib;
 
 import com.raidandfade.haxicord.types.GuildMember;
 import com.raidandfade.haxicord.utils.DPERMS;

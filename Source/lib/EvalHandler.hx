@@ -1,4 +1,4 @@
-package services;
+package lib;
 import haxe.Log;
 import haxe.ds.StringMap;
 import hscript.*;

@@ -13,24 +13,26 @@ function $extend(from, fields) {
 var Bot = function() { };
 Bot.__name__ = true;
 Bot.main = function() {
-	Bot.startTime = new Date();
-	Bot.bot = new com_raidandfade_haxicord_DiscordClient(Bot.getToken());
-	Bot.bot.onReady = Bot.onReady;
-	Bot.bot.onMessage = MessageHandler.handle;
-	Bot.bot.onGuildCreate = function(g) {
-	};
-	Bot.bot.onMemberJoin = Bot.onMemberJoin;
-	services_Modio.init();
-	Bot.onDelay();
+	lib_Settings.loadLogs();
+	try {
+		Bot.bot = new com_raidandfade_haxicord_DiscordClient(Bot.getToken());
+		Bot.bot.onReady = Bot.onReady;
+		Bot.bot.onMessage = MessageHandler.handle;
+		Bot.bot.onGuildCreate = function(g) {
+		};
+		Bot.bot.onMemberJoin = Bot.onMemberJoin;
+	} catch( e ) {
+		haxe_CallStack.lastException = e;
+		haxe_Log.trace("Fatal Error : " + Std.string(((e) instanceof js__$Boot_HaxeError) ? e.val : e),{ fileName : "Source/Bot.hx", lineNumber : 31, className : "Bot", methodName : "main"});
+		Bot.main();
+	}
 };
 Bot.onDelay = function() {
-	haxe_Log.trace(services_Modio.getMods(),{ fileName : "Source/Bot.hx", lineNumber : 27, className : "Bot", methodName : "onDelay"});
 	haxe_Timer.delay(Bot.onDelay,10000);
 };
 Bot.onReady = function() {
-	haxe_Log.trace("My invite link is: " + Bot.bot.getInviteLink(),{ fileName : "Source/Bot.hx", lineNumber : 32, className : "Bot", methodName : "onReady"});
-	haxe_Log.trace(new Date().getTime() - Bot.startTime.getTime(),{ fileName : "Source/Bot.hx", lineNumber : 33, className : "Bot", methodName : "onReady"});
-	BotError.sendErrors();
+	haxe_Log.trace("Ready!",{ fileName : "Source/Bot.hx", lineNumber : 35, className : "Bot", methodName : "onReady"});
+	haxe_Log.trace("Invite link : " + Bot.bot.getInviteLink(com_raidandfade_haxicord_utils_DPERMS.ADMINISTRATOR),{ fileName : "Source/Bot.hx", lineNumber : 35, className : "Bot", methodName : "onReady"});
 };
 Bot.onMemberJoin = function(g,m) {
 };
@@ -48,42 +50,13 @@ Bot.getModioKey = function() {
 		return process.env["modio_key"].toString();
 	}
 };
-Bot.prototype = {
-	tick: function() {
-	}
-	,__class__: Bot
-};
-var BotError = function(message,critical) {
-	if(critical == null) {
-		critical = false;
-	}
-	this.error = message;
-	BotError.error_map.push(this);
-	BotError.sendErrors();
-};
-BotError.__name__ = true;
-BotError.sendErrors = function() {
-	var b = new StringBuf();
-	var _g = 0;
-	var _g1 = BotError.error_map;
-	while(_g < _g1.length) {
-		var o = _g1[_g];
-		++_g;
-		b.b += Std.string(o.error);
-	}
-	Bot.bot.sendMessage("639182974931435550",{ content : b.b});
-	b = null;
-};
-BotError.prototype = {
-	__class__: BotError
-};
 var CommandHandler = function() { };
 CommandHandler.__name__ = true;
 CommandHandler.init = function(_bot) {
 	CommandHandler.has_init = true;
 	CommandHandler.bot = _bot;
-	CommandHandler.addCommand("help",new commands_Help());
 	CommandHandler.addCommand("kick",new commands_Kick());
+	CommandHandler.addCommand("mod",new commands_Mod());
 };
 CommandHandler.addCommand = function(cname,cclass) {
 	if(!CommandHandler.has_init) {
@@ -112,17 +85,46 @@ CommandHandler.handle = function(m) {
 		CommandHandler.init(Bot.bot);
 	}
 	if(m.content.substring(0,Bot.prefix.length) == Bot.prefix) {
-		var coms = CommandHandler.commands.keys();
-		while(coms.hasNext()) {
-			var coms1 = coms.next();
-			if(HxOverrides.substr(m.content,Bot.prefix.length,coms1.length) == coms1) {
-				var _this = CommandHandler.commands;
-				(__map_reserved[coms1] != null ? _this.getReserved(coms1) : _this.h[coms1]).call(m,CommandHandler.bot);
-				return;
+		var command = m.content.substring(Bot.prefix.length,m.content.indexOf(" ") > 0 ? m.content.indexOf(" ") : m.content.length);
+		haxe_Log.trace(command,{ fileName : "Source/CommandHandler.hx", lineNumber : 44, className : "CommandHandler", methodName : "handle"});
+		switch(command) {
+		case "eval":
+			m.reply({ content : "Not implemented yet!"});
+			return;
+		case "help":
+			var commands = CommandHandler.getCommands();
+			var stringBuf_b = "";
+			var o = commands.keys();
+			while(o.hasNext()) {
+				var o1 = o.next();
+				if((__map_reserved[o1] != null ? commands.getReserved(o1) : commands.h[o1]).name == "help") {
+					continue;
+				}
+				stringBuf_b += Std.string("\n" + (__map_reserved[o1] != null ? commands.getReserved(o1) : commands.h[o1]).name + " : " + (__map_reserved[o1] != null ? commands.getReserved(o1) : commands.h[o1]).shortHelp());
 			}
+			m.reply({ embed : { title : "Available Commands", description : stringBuf_b}});
+			break;
+		case "logs":
+			m.reply({ content : "Start logs."});
+			var _g = 0;
+			var _g1 = lib_Settings.formatLogs();
+			while(_g < _g1.length) {
+				var o2 = _g1[_g];
+				++_g;
+				m.reply({ content : o2});
+			}
+			m.reply({ content : "End logs."});
+			return;
+		default:
+			var _this = CommandHandler.commands;
+			if(__map_reserved[command] != null ? _this.existsReserved(command) : _this.h.hasOwnProperty(command)) {
+				var _this1 = CommandHandler.commands;
+				(__map_reserved[command] != null ? _this1.getReserved(command) : _this1.h[command]).call(m,Bot.bot);
+			} else {
+				m.reply({ content : "No command found : " + command});
+			}
+			return;
 		}
-		m.reply({ content : "No command found : " + HxOverrides.substr(m.content,Bot.prefix.length,m.content.indexOf(" "))});
-		return;
 	}
 };
 CommandHandler.parseArgs = function(m,n) {
@@ -352,6 +354,26 @@ Reflect.fields = function(o) {
 	}
 	return a;
 };
+Reflect.isFunction = function(f) {
+	if(typeof(f) == "function") {
+		return !(f.__name__ || f.__ename__);
+	} else {
+		return false;
+	}
+};
+Reflect.compareMethods = function(f1,f2) {
+	if(f1 == f2) {
+		return true;
+	}
+	if(!Reflect.isFunction(f1) || !Reflect.isFunction(f2)) {
+		return false;
+	}
+	if(f1.scope == f2.scope && f1.method == f2.method) {
+		return f1.method != null;
+	} else {
+		return false;
+	}
+};
 var Std = function() { };
 Std.__name__ = true;
 Std.string = function(s) {
@@ -540,7 +562,6 @@ var com_raidandfade_haxicord_DiscordClient = $hx_exports["com"]["raidandfade"]["
 	this.reconnectTimeout = 1;
 	this.resumeable = false;
 	this.ready = false;
-	com_raidandfade_haxicord_logger_Logger.registerLogger();
 	this.token = _tkn;
 	this.isBot = true;
 	this.endpoints = new com_raidandfade_haxicord_endpoints_Endpoints(this);
@@ -557,7 +578,7 @@ var com_raidandfade_haxicord_DiscordClient = $hx_exports["com"]["raidandfade"]["
 	} else {
 		this.dataCache = _storage;
 	}
-	haxe_Log.trace("Starting Client",{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 149, className : "com.raidandfade.haxicord.DiscordClient", methodName : "new"});
+	haxe_Log.trace("Starting Client",{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 149, className : "com.raidandfade.haxicord.DiscordClient", methodName : "new"});
 	this.endpoints.getGateway(this.isBot,$bind(this,this.connect));
 	haxe_MainLoop.add($bind(this,this.tick));
 };
@@ -570,7 +591,7 @@ com_raidandfade_haxicord_DiscordClient.prototype = {
 	,connect: function(gateway,error) {
 		var _gthis = this;
 		try {
-			haxe_Log.trace("Connecting",{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 170, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
+			haxe_Log.trace("Connecting",{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 170, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
 			if(error != null) {
 				throw js__$Boot_HaxeError.wrap(error);
 			}
@@ -595,21 +616,24 @@ com_raidandfade_haxicord_DiscordClient.prototype = {
 				if(_gthis.session == "") {
 					_gthis.resumeable = false;
 				}
-				haxe_Log.trace("Socket Closed with code " + m + ", Re-Opening in " + _gthis.reconnectTimeout + "s. " + (_gthis.resumeable ? "Resuming" : ""),{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 201, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
-				_gthis.session = "";
-				_gthis.resumeable = false;
-				Bot.bot = null;
-				haxe_Timer.delay(Bot.main,100);
+				haxe_Log.trace("Socket Closed with code " + m + ", Re-Opening in " + _gthis.reconnectTimeout + "s. " + (_gthis.resumeable ? "Resuming" : ""),{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 201, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
+				_gthis.ws_error(gateway,error);
 			};
 			this.ws.onError = function(e) {
 				_gthis.resumeable = false;
-				haxe_Log.trace("Websocket errored!",{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 214, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
-				haxe_Log.trace(e,{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 215, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
+				haxe_Log.trace("Websocket errored!",{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 209, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
+				haxe_Log.trace(e,{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 210, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
 			};
 		} catch( e1 ) {
 			haxe_CallStack.lastException = e1;
-			haxe_Log.trace(((e1) instanceof js__$Boot_HaxeError) ? e1.val : e1,{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 218, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
+			haxe_Log.trace(((e1) instanceof js__$Boot_HaxeError) ? e1.val : e1,{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 213, className : "com.raidandfade.haxicord.DiscordClient", methodName : "connect"});
 		}
+	}
+	,ws_error: function(gateway,error) {
+		this.session = "";
+		this.resumeable = false;
+		Bot.bot = null;
+		Bot.main();
 	}
 	,sendWs: function(d) {
 		this.ws.sendJson(d);
@@ -629,7 +653,7 @@ com_raidandfade_haxicord_DiscordClient.prototype = {
 				this.receiveEvent(m);
 				break;
 			case 9:
-				haxe_Log.trace("Session was invalidated, killing.",{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 254, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
+				haxe_Log.trace("Session was invalidated, killing.",{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 256, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
 				this.resumeable = !m.d;
 				this.ws.close();
 				break;
@@ -654,8 +678,8 @@ com_raidandfade_haxicord_DiscordClient.prototype = {
 		} catch( er ) {
 			haxe_CallStack.lastException = er;
 			var er1 = ((er) instanceof js__$Boot_HaxeError) ? er.val : er;
-			haxe_Log.trace("UNCAUGHT ERROR IN EVENT CALLBACK.",{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 263, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
-			haxe_Log.trace(Std.string(er1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 264, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
+			haxe_Log.trace("UNCAUGHT ERROR IN EVENT CALLBACK.",{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 265, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
+			haxe_Log.trace(Std.string(er1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 266, className : "com.raidandfade.haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
 		}
 	}
 	,receiveEvent: function(m) {
@@ -874,7 +898,7 @@ com_raidandfade_haxicord_DiscordClient.prototype = {
 		case "WEBHOOKS_UPDATE":
 			break;
 		default:
-			haxe_Log.trace("Unhandled event " + m.t,{ fileName : "Source/com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 433, className : "com.raidandfade.haxicord.DiscordClient", methodName : "receiveEvent"});
+			haxe_Log.trace("Unhandled event " + m.t,{ fileName : "com/raidandfade/haxicord/DiscordClient.hx", lineNumber : 435, className : "com.raidandfade.haxicord.DiscordClient", methodName : "receiveEvent"});
 		}
 	}
 	,setStatus: function(status) {
@@ -2294,9 +2318,9 @@ com_raidandfade_haxicord_endpoints_Endpoints.prototype = {
 				tmp.remaining--;
 			}
 		} else {
-			var this2 = this.rateLimitCache;
+			var this11 = this.rateLimitCache;
 			var value1 = new com_raidandfade_haxicord_endpoints_RateLimit(1,0,-1);
-			var _this7 = this2;
+			var _this7 = this11;
 			if(__map_reserved[rateLimitName] != null) {
 				_this7.setReserved(rateLimitName,value1);
 			} else {
@@ -2325,9 +2349,9 @@ com_raidandfade_haxicord_endpoints_Endpoints.prototype = {
 						result[i] = _this12[i];
 					}
 					var arrCopy = result;
-					var this3 = _gthis.limitedQueue;
+					var this12 = _gthis.limitedQueue;
 					var value2 = [];
-					var _this13 = this3;
+					var _this13 = this12;
 					if(__map_reserved[rateLimitName1] != null) {
 						_this13.setReserved(rateLimitName1,value2);
 					} else {
@@ -2357,9 +2381,9 @@ com_raidandfade_haxicord_endpoints_Endpoints.prototype = {
 				var limit = Std.parseInt(__map_reserved["x-ratelimit-limit"] != null ? headers.getReserved("x-ratelimit-limit") : headers.h["x-ratelimit-limit"]);
 				var remaining = Std.parseInt(__map_reserved["x-ratelimit-remaining"] != null ? headers.getReserved("x-ratelimit-remaining") : headers.h["x-ratelimit-remaining"]);
 				var reset = parseFloat(__map_reserved["x-ratelimit-reset"] != null ? headers.getReserved("x-ratelimit-reset") : headers.h["x-ratelimit-reset"]);
-				var this4 = _gthis.rateLimitCache;
+				var this13 = _gthis.rateLimitCache;
 				var value3 = new com_raidandfade_haxicord_endpoints_RateLimit(limit,remaining,reset);
-				var _this14 = this4;
+				var _this14 = this13;
 				if(__map_reserved[rateLimitName] != null) {
 					_this14.setReserved(rateLimitName,value3);
 				} else {
@@ -2368,9 +2392,9 @@ com_raidandfade_haxicord_endpoints_Endpoints.prototype = {
 				if(remaining == 0) {
 					var delay = (reset - new Date().getTime() / 1000 | 0) * 1000 + 500;
 					var waitForLimit = function(rateLimitName2,rateLimit) {
-						var this5 = _gthis.rateLimitCache;
+						var this14 = _gthis.rateLimitCache;
 						var value4 = new com_raidandfade_haxicord_endpoints_RateLimit(limit,limit,-1);
-						var _this15 = this5;
+						var _this15 = this14;
 						if(__map_reserved[rateLimitName2] != null) {
 							_this15.setReserved(rateLimitName2,value4);
 						} else {
@@ -2394,9 +2418,9 @@ com_raidandfade_haxicord_endpoints_Endpoints.prototype = {
 					}
 				}
 			} else {
-				var this6 = _gthis.rateLimitCache;
+				var this15 = _gthis.rateLimitCache;
 				var value5 = new com_raidandfade_haxicord_endpoints_RateLimit(50,50,-1);
-				var _this18 = this6;
+				var _this18 = this15;
 				if(__map_reserved[rateLimitName] != null) {
 					_this18.setReserved(rateLimitName,value5);
 				} else {
@@ -4239,8 +4263,8 @@ com_raidandfade_haxicord_utils_Https._makeRequest = function(url,method,_callbac
 			} catch( er ) {
 				haxe_CallStack.lastException = er;
 				var er1 = ((er) instanceof js__$Boot_HaxeError) ? er.val : er;
-				haxe_Log.trace("UNCAUGHT ERROR IN haxe.Https.makeRequest CALLBACK.",{ fileName : "com/raidandfade/haxicord/utils/Https.hx", lineNumber : 100, className : "com.raidandfade.haxicord.utils.Https", methodName : "_makeRequest"});
-				haxe_Log.trace(Std.string(er1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "com/raidandfade/haxicord/utils/Https.hx", lineNumber : 101, className : "com.raidandfade.haxicord.utils.Https", methodName : "_makeRequest"});
+				haxe_Log.trace("UNCAUGHT ERROR IN haxe.Https.makeRequest CALLBACK.",{ fileName : "com/raidandfade/haxicord/utils/Https.hx", lineNumber : 102, className : "com.raidandfade.haxicord.utils.Https", methodName : "_makeRequest"});
+				haxe_Log.trace(Std.string(er1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "com/raidandfade/haxicord/utils/Https.hx", lineNumber : 103, className : "com.raidandfade.haxicord.utils.Https", methodName : "_makeRequest"});
 			}
 		};
 		if(_headers == null) {
@@ -4270,8 +4294,8 @@ com_raidandfade_haxicord_utils_Https._makeRequest = function(url,method,_callbac
 			var h1 = h.next();
 			headers[h1] = __map_reserved[h1] != null ? _headers.getReserved(h1) : _headers.h[h1];
 		}
-		var path = js_node_Url.parse(url).pathname;
-		var options = { "hostname" : js_node_Url.parse(url).host, "path" : path, "method" : method, "headers" : headers};
+		var path = new URL(url).pathname;
+		var options = { "hostname" : new URL(url).host, "path" : path, "method" : method, "headers" : headers};
 		var req = js_node_Https.request(options,function(res) {
 			var datas = "";
 			res.on("data",function(all) {
@@ -4311,7 +4335,7 @@ com_raidandfade_haxicord_utils_Https._makeRequest = function(url,method,_callbac
 	} catch( er2 ) {
 		haxe_CallStack.lastException = er2;
 		var er3 = ((er2) instanceof js__$Boot_HaxeError) ? er2.val : er2;
-		haxe_Log.trace(haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "com/raidandfade/haxicord/utils/Https.hx", lineNumber : 262, className : "com.raidandfade.haxicord.utils.Https", methodName : "_makeRequest"});
+		haxe_Log.trace(haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "com/raidandfade/haxicord/utils/Https.hx", lineNumber : 260, className : "com.raidandfade.haxicord.utils.Https", methodName : "_makeRequest"});
 		_callback({ status : -1, error : Std.string(er3)},null);
 	}
 };
@@ -4325,7 +4349,7 @@ com_raidandfade_haxicord_websocket_WebSocketConnection.__name__ = true;
 com_raidandfade_haxicord_websocket_WebSocketConnection.prototype = {
 	create: function() {
 		var _gthis = this;
-		haxe_Log.trace("starting",{ fileName : "Source/com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 67, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "create"});
+		haxe_Log.trace("starting",{ fileName : "com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 67, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "create"});
 		com_raidandfade_haxicord_websocket_WebSocketConnection.ws = haxe_net_WebSocket.create(com_raidandfade_haxicord_websocket_WebSocketConnection.host,[],null,false);
 		com_raidandfade_haxicord_websocket_WebSocketConnection.ws.onopen = function() {
 			_gthis.ready = true;
@@ -4370,7 +4394,7 @@ com_raidandfade_haxicord_websocket_WebSocketConnection.prototype = {
 				});
 			} catch( e ) {
 				haxe_CallStack.lastException = e;
-				haxe_Log.trace(Std.string(((e) instanceof js__$Boot_HaxeError) ? e.val : e) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Source/com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 125, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "create"});
+				haxe_Log.trace(Std.string(((e) instanceof js__$Boot_HaxeError) ? e.val : e) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 125, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "create"});
 			}
 		};
 		com_raidandfade_haxicord_websocket_WebSocketConnection.ws.onerror = $bind(this,this.onError);
@@ -4391,7 +4415,7 @@ com_raidandfade_haxicord_websocket_WebSocketConnection.prototype = {
 	}
 	,_onClose: function(m) {
 		this.ready = false;
-		haxe_Log.trace("died",{ fileName : "Source/com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 171, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "_onClose"});
+		haxe_Log.trace("died",{ fileName : "com/raidandfade/haxicord/websocket/WebSocketConnection.hx", lineNumber : 173, className : "com.raidandfade.haxicord.websocket.WebSocketConnection", methodName : "_onClose"});
 		this.onClose(m);
 	}
 	,onClose: function(m) {
@@ -4422,31 +4446,6 @@ commands_Command.prototype = {
 	}
 	,__class__: commands_Command
 };
-var commands_Help = function() {
-	this.name = "Help";
-	this.shorthelp = "shorthelp";
-	this.longhelp = "longhelp";
-	commands_Command.call(this);
-};
-commands_Help.__name__ = true;
-commands_Help.__super__ = commands_Command;
-commands_Help.prototype = $extend(commands_Command.prototype,{
-	_call: function(m,_bot) {
-		var commands1 = CommandHandler.getCommands();
-		var stringBuf_b = "";
-		var o = commands1.keys();
-		while(o.hasNext()) {
-			var o1 = o.next();
-			if((__map_reserved[o1] != null ? commands1.getReserved(o1) : commands1.h[o1]).name == "Help") {
-				continue;
-			}
-			stringBuf_b += Std.string("\n" + (__map_reserved[o1] != null ? commands1.getReserved(o1) : commands1.h[o1]).name + " : " + (__map_reserved[o1] != null ? commands1.getReserved(o1) : commands1.h[o1]).shortHelp());
-		}
-		m.reply({ embed : { title : "Available Commands", description : stringBuf_b}});
-		haxe_Log.trace("Help Given",{ fileName : "Source/commands/Help.hx", lineNumber : 19, className : "commands.Help", methodName : "_call"});
-	}
-	,__class__: commands_Help
-});
 var commands_Kick = function() {
 	this.name = "kick";
 	this.shorthelp = "Kicks the mentioned user.";
@@ -4458,10 +4457,59 @@ commands_Kick.__super__ = commands_Command;
 commands_Kick.prototype = $extend(commands_Command.prototype,{
 	_call: function(m,b) {
 		var u = m.getMember();
-		var args = CommandHandler.parseArgs(m,this.name);
-		var tmp = services_UserService.canKick(u);
+		var kick = m.content.split(" ")[1].split("<@").join("").split(">").join("");
+		if(lib_UserService.canKick(u)) {
+			try {
+				m.getGuild().getMember(m.mentions[0].id.id,function(e) {
+					e.kick();
+				});
+				Bot.bot.getUser(kick,function(e1) {
+					m.reply({ content : "User kicked : " + e1.username});
+				});
+			} catch( e2 ) {
+				haxe_CallStack.lastException = e2;
+				m.reply({ content : "An error occured while kicking : " + Std.string(((e2) instanceof js__$Boot_HaxeError) ? e2.val : e2)});
+			}
+		} else {
+			m.reply({ content : "You do not have the required permissions to kick that user!"});
+		}
 	}
 	,__class__: commands_Kick
+});
+var commands_Mod = function() {
+	commands_Command.call(this);
+	this.name = "mod";
+	this.shorthelp = "Get a mod!";
+	this.longhelp = "Returns a mod, usage : `]mod mod_name`";
+};
+commands_Mod.__name__ = true;
+commands_Mod.__super__ = commands_Command;
+commands_Mod.prototype = $extend(commands_Command.prototype,{
+	processMods: function(data) {
+		var json = JSON.parse(data);
+		var data1 = json.data;
+		if(json.result_count > 1) {
+			var b_b = "";
+			var _g = 0;
+			var _g1 = json.result_count;
+			while(_g < _g1) {
+				var o = _g++;
+				b_b += Std.string(Std.string(Reflect.field(data1,"0").name) + "\n");
+			}
+			this.lastMessage.reply({ content : "There are multiple mods matching that input : \n" + b_b});
+		} else if(json.result_count == 1) {
+			var mod = Reflect.field(data1,"0");
+			this.lastMessage.reply({ embed : { title : mod.name, description : mod.summary, fields : [{ name : "Id :", value : mod.id, _inline : true}]}});
+		} else {
+			haxe_Log.trace("Mod not found : " + HxOverrides.substr(this.lastMessage.content,this.lastMessage.content.indexOf(" "),null),{ fileName : "Source/commands/Mod.hx", lineNumber : 29, className : "commands.Mod", methodName : "processMods"});
+			this.lastMessage.reply({ content : "No such mod : " + HxOverrides.substr(this.lastMessage.content,this.lastMessage.content.indexOf(" "),null)});
+		}
+	}
+	,_call: function(m,b) {
+		this.lastMessage = m;
+		lib_Modio.makeRequest("https://api.mod.io/v1/games/34/mods?api_key=" + Bot.getModioKey() + "&_q=" + HxOverrides.substr(m.content,m.content.indexOf(" "),null),$bind(this,this.processMods));
+	}
+	,__class__: commands_Mod
 });
 var haxe_StackItem = $hxEnums["haxe.StackItem"] = { __ename__ : true, __constructs__ : ["CFunction","Module","FilePos","Method","LocalFunction"]
 	,CFunction: {_hx_index:0,__enum__:"haxe.StackItem",toString:$estr}
@@ -4972,6 +5020,144 @@ haxe_ds_StringMap.prototype = {
 	}
 	,__class__: haxe_ds_StringMap
 };
+var haxe_http_HttpBase = function(url) {
+	this.url = url;
+	this.headers = [];
+	this.params = [];
+	this.emptyOnData = $bind(this,this.onData);
+};
+haxe_http_HttpBase.__name__ = true;
+haxe_http_HttpBase.prototype = {
+	setHeader: function(name,value) {
+		var _g = 0;
+		var _g1 = this.headers.length;
+		while(_g < _g1) {
+			var i = _g++;
+			if(this.headers[i].name == name) {
+				this.headers[i] = { name : name, value : value};
+				return;
+			}
+		}
+		this.headers.push({ name : name, value : value});
+	}
+	,addParameter: function(name,value) {
+		this.params.push({ name : name, value : value});
+	}
+	,onData: function(data) {
+	}
+	,onBytes: function(data) {
+	}
+	,onError: function(msg) {
+	}
+	,onStatus: function(status) {
+	}
+	,hasOnData: function() {
+		return !Reflect.compareMethods($bind(this,this.onData),this.emptyOnData);
+	}
+	,success: function(data) {
+		this.responseBytes = data;
+		this.responseAsString = null;
+		if(this.hasOnData()) {
+			this.onData(this.get_responseData());
+		}
+		this.onBytes(this.responseBytes);
+	}
+	,get_responseData: function() {
+		if(this.responseAsString == null && this.responseBytes != null) {
+			this.responseAsString = this.responseBytes.getString(0,this.responseBytes.length,haxe_io_Encoding.UTF8);
+		}
+		return this.responseAsString;
+	}
+	,__class__: haxe_http_HttpBase
+};
+var haxe_http_HttpNodeJs = function(url) {
+	haxe_http_HttpBase.call(this,url);
+};
+haxe_http_HttpNodeJs.__name__ = true;
+haxe_http_HttpNodeJs.__super__ = haxe_http_HttpBase;
+haxe_http_HttpNodeJs.prototype = $extend(haxe_http_HttpBase.prototype,{
+	request: function(post) {
+		var _gthis = this;
+		this.responseAsString = null;
+		this.responseBytes = null;
+		var parsedUrl = js_node_Url.parse(this.url);
+		var secure = parsedUrl.protocol == "https:";
+		var host = parsedUrl.hostname;
+		var path = parsedUrl.path;
+		var port = parsedUrl.port != null ? Std.parseInt(parsedUrl.port) : secure ? 443 : 80;
+		var h = { };
+		var _g = 0;
+		var _g1 = this.headers;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			var arr = Reflect.field(h,i.name);
+			if(arr == null) {
+				arr = [];
+				h[i.name] = arr;
+			}
+			arr.push(i.value);
+		}
+		if(this.postData != null || this.postBytes != null) {
+			post = true;
+		}
+		var uri = null;
+		var _g2 = 0;
+		var _g3 = this.params;
+		while(_g2 < _g3.length) {
+			var p = _g3[_g2];
+			++_g2;
+			if(uri == null) {
+				uri = "";
+			} else {
+				uri += "&";
+			}
+			var s = p.name;
+			var uri1 = encodeURIComponent(s) + "=";
+			var s1 = p.value;
+			uri += uri1 + encodeURIComponent(s1);
+		}
+		var question = path.split("?").length <= 1;
+		if(uri != null) {
+			path += (question ? "?" : "&") + uri;
+		}
+		var opts = { protocol : parsedUrl.protocol, hostname : host, port : port, method : post ? "POST" : "GET", path : path, headers : h};
+		var httpResponse = function(res) {
+			res.setEncoding("binary");
+			var s2 = res.statusCode;
+			if(s2 != null) {
+				_gthis.onStatus(s2);
+			}
+			var data = [];
+			res.on("data",function(chunk) {
+				var httpResponse1 = js_node_buffer_Buffer.from(chunk,"binary");
+				data.push(httpResponse1);
+			});
+			res.on("end",function(_) {
+				var buf = data.length == 1 ? data[0] : js_node_buffer_Buffer.concat(data);
+				var httpResponse2 = buf.buffer.slice(buf.byteOffset,buf.byteOffset + buf.byteLength);
+				_gthis.responseBytes = haxe_io_Bytes.ofData(httpResponse2);
+				_gthis.req = null;
+				if(s2 != null && s2 >= 200 && s2 < 400) {
+					_gthis.success(_gthis.responseBytes);
+				} else {
+					_gthis.onError("Http Error #" + s2);
+				}
+			});
+		};
+		this.req = secure ? js_node_Https.request(opts,httpResponse) : js_node_Http.request(opts,httpResponse);
+		if(post) {
+			if(this.postData != null) {
+				this.req.write(this.postData);
+			} else if(this.postBytes != null) {
+				this.req.setHeader("Content-Length","" + this.postBytes.length);
+				this.req.write(js_node_buffer_Buffer.from(this.postBytes.b.bufferValue));
+			}
+		}
+		this.req.end();
+	}
+	,__class__: haxe_http_HttpNodeJs
+});
 var haxe_io_Bytes = function(data) {
 	this.length = data.byteLength;
 	this.b = new Uint8Array(data);
@@ -5026,7 +5212,52 @@ haxe_io_Bytes.ofData = function(b) {
 	return new haxe_io_Bytes(b);
 };
 haxe_io_Bytes.prototype = {
-	toHex: function() {
+	getString: function(pos,len,encoding) {
+		if(pos < 0 || len < 0 || pos + len > this.length) {
+			throw new js__$Boot_HaxeError(haxe_io_Error.OutsideBounds);
+		}
+		if(encoding == null) {
+			encoding = haxe_io_Encoding.UTF8;
+		}
+		var s = "";
+		var b = this.b;
+		var i = pos;
+		var max = pos + len;
+		switch(encoding._hx_index) {
+		case 0:
+			var debug = pos > 0;
+			while(i < max) {
+				var c = b[i++];
+				if(c < 128) {
+					if(c == 0) {
+						break;
+					}
+					s += String.fromCodePoint(c);
+				} else if(c < 224) {
+					var code = (c & 63) << 6 | b[i++] & 127;
+					s += String.fromCodePoint(code);
+				} else if(c < 240) {
+					var c2 = b[i++];
+					var code1 = (c & 31) << 12 | (c2 & 127) << 6 | b[i++] & 127;
+					s += String.fromCodePoint(code1);
+				} else {
+					var c21 = b[i++];
+					var c3 = b[i++];
+					var u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
+					s += String.fromCodePoint(u);
+				}
+			}
+			break;
+		case 1:
+			while(i < max) {
+				var c1 = b[i++] | b[i++] << 8;
+				s += String.fromCodePoint(c1);
+			}
+			break;
+		}
+		return s;
+	}
+	,toHex: function() {
 		var s_b = "";
 		var chars = [];
 		var str = "0123456789abcdef";
@@ -5164,11 +5395,11 @@ var haxe_net_impl_WebSocketNodejs = function(url,options) {
 		if(typeof(m) == "string") {
 			_gthis.onmessageString(m);
 		} else if(((m) instanceof ArrayBuffer)) {
-			haxe_Log.trace("Unhandled websocket onmessage " + m,{ fileName : "haxe/net/impl/WebSocketNodejs.hx", lineNumber : 35, className : "haxe.net.impl.WebSocketNodejs", methodName : "new"});
+			haxe_Log.trace("Unhandled websocket onmessage " + m,{ fileName : "haxe/net/impl/websocketnodejs.hx", lineNumber : 35, className : "haxe.net.impl.WebSocketNodejs", methodName : "new"});
 		} else if(((m) instanceof js_node_buffer_Buffer)) {
 			_gthis.onmessageBytes(haxe_io_Bytes.ofData(m));
 		} else {
-			haxe_Log.trace("Unhandled websocket onmessage " + m,{ fileName : "haxe/net/impl/WebSocketNodejs.hx", lineNumber : 47, className : "haxe.net.impl.WebSocketNodejs", methodName : "new"});
+			haxe_Log.trace("Unhandled websocket onmessage " + m,{ fileName : "haxe/net/impl/websocketnodejs.hx", lineNumber : 47, className : "haxe.net.impl.WebSocketNodejs", methodName : "new"});
 		}
 	});
 };
@@ -5436,7 +5667,16 @@ js_Boot.__isNativeObj = function(o) {
 js_Boot.__resolveNativeClass = function(name) {
 	return $global[name];
 };
+var js_lib__$ArrayBuffer_ArrayBufferCompat = function() { };
+js_lib__$ArrayBuffer_ArrayBufferCompat.__name__ = true;
+js_lib__$ArrayBuffer_ArrayBufferCompat.sliceImpl = function(begin,end) {
+	var u = new Uint8Array(this,begin,end == null ? null : end - begin);
+	var resultArray = new Uint8Array(u.byteLength);
+	resultArray.set(u);
+	return resultArray.buffer;
+};
 var js_node_Fs = require("fs");
+var js_node_Http = require("http");
 var js_node_Https = require("https");
 var js_node__$KeyValue_KeyValue_$Impl_$ = {};
 js_node__$KeyValue_KeyValue_$Impl_$.__name__ = true;
@@ -5513,34 +5753,80 @@ lib_JsonHandler.write = function(file,s) {
 		haxe_Log.trace(((e) instanceof js__$Boot_HaxeError) ? e.val : e,{ fileName : "Source/lib/JsonHandler.hx", lineNumber : 40, className : "lib.JsonHandler", methodName : "write"});
 	}
 };
-var services_Modio = function() { };
-services_Modio.__name__ = true;
-services_Modio.init = function() {
+var lib_Modio = function() { };
+lib_Modio.__name__ = true;
+lib_Modio.getMods = function(cb) {
+	lib_Modio.getModioData("games/34/mods",cb);
 };
-services_Modio.getMods = function() {
-	var key = Bot.getModioKey();
-	var data = null;
-	var this1 = { };
-	var headers = this1;
-	headers["accept"] = "application-json";
-	var path = "games/34/mods?api_key=" + key;
-	var options = { host : "api.mod.io/v1/", path : path, port : 403, method : "GET", headers : headers};
-	var req = js_node_Https.request(options,function(res) {
-		res.on("data",function(all) {
-			data += all;
-		});
-		res.on("end",function() {
-		});
-	});
-	req.on("error",function(e) {
-		new BotError("MODIO ERROR : " + Std.string(e));
-	});
-	req.end();
-	return data;
+lib_Modio.getModioData = function(_path,cb) {
+	lib_Modio.makeRequest("https://api.mod.io/v1/" + _path + "?api_key=" + Bot.getModioKey(),cb);
 };
-var services_UserService = function() { };
-services_UserService.__name__ = true;
-services_UserService.getPerms = function(u,s) {
+lib_Modio.makeRequest = function(full_path,cb) {
+	var req = new haxe_http_HttpNodeJs(full_path);
+	req.setHeader("Content-Type","application-json");
+	req.addParameter("port","443");
+	req.onData = function(e) {
+		cb(e);
+	};
+	req.onError = function(e1) {
+		haxe_Log.trace("Modio Error : " + e1,{ fileName : "Source/lib/Modio.hx", lineNumber : 24, className : "lib.Modio", methodName : "makeRequest"});
+	};
+	req.onStatus = function(e2) {
+		haxe_Log.trace("Modio Status : " + e2,{ fileName : "Source/lib/Modio.hx", lineNumber : 27, className : "lib.Modio", methodName : "makeRequest"});
+	};
+	req.request();
+};
+var lib_Settings = function() { };
+lib_Settings.__name__ = true;
+lib_Settings.setTrace = function() {
+	lib_Settings.oldTrace = haxe_Log.trace;
+	haxe_Log.trace = function(v,infos) {
+		lib_Settings.addLog(v,infos);
+		lib_Settings.oldTrace("Logged!");
+		lib_Settings.oldTrace(v,infos);
+	};
+};
+lib_Settings.loadLogs = function() {
+	lib_Settings.logs = lib_Settings.getLogs();
+};
+lib_Settings.addLog = function(v,infos) {
+	lib_Settings.logs.logs.push(haxe_Log.formatOutput(v,infos));
+	lib_JsonHandler.write("logs.json",JSON.stringify(lib_Settings.logs));
+};
+lib_Settings.getLogs = function() {
+	var tmp = lib_JsonHandler.read("logs.json");
+	if(tmp == null || tmp == "") {
+		return { logs : []};
+	}
+	return JSON.parse(tmp);
+};
+lib_Settings.formatLogs = function() {
+	var tmp = lib_Settings.logs.logs.join("\n");
+	var length = tmp.length;
+	var max = 1990;
+	var tmp2 = length / max;
+	var tmp3 = Math.ceil(tmp2);
+	var r = [];
+	haxe_Log.trace(tmp,{ fileName : "Source/lib/Settings.hx", lineNumber : 38, className : "lib.Settings", methodName : "formatLogs"});
+	var _g = 0;
+	var _g1 = tmp3;
+	while(_g < _g1) {
+		var o = _g++;
+		r.push("```\n" + tmp.substring(max * o,max * (o + 1)) + "\n```");
+	}
+	return r;
+};
+lib_Settings.clearLogs = function() {
+	lib_Settings.logs = { logs : []};
+	lib_JsonHandler.write("logs.json","");
+};
+lib_Settings.getUser = function(id) {
+};
+lib_Settings.getGuild = function(id) {
+};
+var lib_UserService = function() { };
+lib_UserService.__name__ = true;
+lib_UserService.getPerms = function(u,s) {
 	var perm = Reflect.field(com_raidandfade_haxicord_utils_DPERMS,s);
 	if(u.hasPermissions(perm)) {
 		return true;
@@ -5548,11 +5834,11 @@ services_UserService.getPerms = function(u,s) {
 		return false;
 	}
 };
-services_UserService.canKick = function(u) {
+lib_UserService.canKick = function(u) {
 	var tmp = u.hasPermissions(com_raidandfade_haxicord_utils_DPERMS.ADMINISTRATOR) || u.hasPermissions(com_raidandfade_haxicord_utils_DPERMS.KICK_MEMBERS);
 	return tmp;
 };
-services_UserService.canBan = function(u) {
+lib_UserService.canBan = function(u) {
 	var tmp = u.hasPermissions(com_raidandfade_haxicord_utils_DPERMS.ADMINISTRATOR) || u.hasPermissions(com_raidandfade_haxicord_utils_DPERMS.BAN_MEMBERS);
 	return tmp;
 };
@@ -5705,8 +5991,10 @@ Object.defineProperty(js__$Boot_HaxeError.prototype,"message",{ get : function()
 	return String(this.val);
 }});
 js_Boot.__toStr = ({ }).toString;
+if(ArrayBuffer.prototype.slice == null) {
+	ArrayBuffer.prototype.slice = js_lib__$ArrayBuffer_ArrayBufferCompat.sliceImpl;
+}
 Bot.prefix = "]";
-BotError.error_map = [];
 CommandHandler.has_init = false;
 CommandHandler.commands = new haxe_ds_StringMap();
 DateTools.DAY_SHORT_NAMES = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -5753,7 +6041,7 @@ com_raidandfade_haxicord_websocket_WebSocketConnection.ZLIB_SUFFIX = "0000ffff";
 com_raidandfade_haxicord_websocket_WebSocketConnection.BUFFER_SIZE = 1048576;
 haxe_EntryPoint.pending = [];
 haxe_EntryPoint.threadCount = 0;
-services_Modio.game_id = 34;
+lib_Settings.logs = { logs : []};
 {
 	Bot.main();
 	haxe_EntryPoint.run();

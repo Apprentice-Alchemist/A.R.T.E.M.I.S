@@ -1,4 +1,5 @@
 package;
+import js.lib.webassembly.Module;
 import haxe.ds.EnumValueMap;
 import com.raidandfade.haxicord.endpoints.Endpoints.ErrorReport;
 import com.raidandfade.haxicord.DiscordClient;
@@ -14,9 +15,8 @@ class CommandHandler {
 	public static function init(_bot) {
 		has_init = true;
 		bot = _bot;
-		addCommand("help",new Help());
-		// addCommand("eval", new Eval());
 		addCommand("kick",new Kick());
+		addCommand("mod",new Mod());
 	}
 
 	public static function addCommand(cname:String, cclass) {
@@ -38,13 +38,31 @@ class CommandHandler {
 		if (!has_init){
 			init(Bot.bot);
 		}
+	
 		if (m.content.substring(0, Bot.prefix.length) == Bot.prefix) {
-			for (coms in commands.keys()) {
-				if (m.content.substr(Bot.prefix.length, coms.length) == coms) {
-					return commands.get(coms).call(m, bot);
-				}			
+			var command = m.content.substring(Bot.prefix.length,m.content.indexOf(" ") > 0 ? m.content.indexOf(" ") : m.content.length);
+			trace(command);
+			switch command {
+				case "help":
+					var commands = CommandHandler.getCommands();
+					var stringBuf = new StringBuf();
+					for (o in commands.keys()) {
+						if (commands.get(o).name == "help")
+							continue;
+						stringBuf.add("\n" + commands.get(o).name + " : " + commands.get(o).shortHelp());
+					}
+					m.reply({embed: {title: "Available Commands", description: stringBuf.toString()}});
+				case "eval": 
+					return m.reply({content: "Not implemented yet!"});
+				case "logs":
+					m.reply({content: "Start logs."});
+					for(o in Settings.formatLogs()){
+						m.reply({content: o});
+					}
+					return m.reply({content: "End logs."});
+				default:
+					return commands.exists(command) ? commands.get(command).call(m, Bot.bot) : m.reply({content: "No command found : " + command});
 			}
-			return m.reply({content: "No command found : " + m.content.substr(Bot.prefix.length,m.content.indexOf(" "))});
 		}	
 	}
 	public static function parseArgs(m:Message,n:String){
