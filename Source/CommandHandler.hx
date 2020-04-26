@@ -1,7 +1,5 @@
 package;
-import js.lib.webassembly.Module;
-import haxe.ds.EnumValueMap;
-import com.raidandfade.haxicord.endpoints.Endpoints.ErrorReport;
+import lib.Settings.Logger;
 import com.raidandfade.haxicord.DiscordClient;
 import com.raidandfade.haxicord.types.Message;
 import commands.Command;
@@ -53,17 +51,30 @@ class CommandHandler {
 					}
 					m.reply({embed: {title: "Available Commands", description: stringBuf.toString()}});
 				case "eval": 
-					return m.reply({content: "Not implemented yet!"});
+					return eval(m);
 				case "logs":
-					m.reply({content: "Start logs."});
-					for(o in Settings.formatLogs()){
-						m.reply({content: o});
-					}
-					return m.reply({content: "End logs."});
+					m.reply({content: "Start logs."},function(m,e){
+						for (o in Logger.formatLogs()) {
+							m.reply({content: o},function(m,e){
+								m.reply({content: "End logs."});
+							});
+						}
+					});
+					
+					return;
 				default:
 					return commands.exists(command) ? commands.get(command).call(m, Bot.bot) : m.reply({content: "No command found : " + command});
 			}
 		}	
+	}
+	public static function eval(m:Message){
+		if (m.author.id.id != "525025580106907659"){
+			return m.reply({content: "You are not allowed to use this command!"});
+		} else if (m.author.id.id == "525025580106907659"){
+			return m.reply({embed:{description: lib.EvalHandler.evaluate(m.content.substring(m.content.indexOf(" "), m.content.length))}});
+		}else{
+			return;
+		}
 	}
 	public static function parseArgs(m:Message,n:String){
 		var tmp = m.content.substr(m.content.indexOf(" "));

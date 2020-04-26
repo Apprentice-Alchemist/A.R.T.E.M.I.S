@@ -16,12 +16,12 @@ class JsonHandler {
         var content:Null<Dynamic> = null;
       if (canRead(file)){
           try{
-			content = Json.parse(sys.io.File.getContent(file));
+			content = sys.io.File.getContent(file);
           }catch(e:Dynamic){
               trace(e);
           }
       }
-		return content;
+		return Json.parse(content);
 		
     }
 	/**
@@ -29,12 +29,11 @@ class JsonHandler {
         @param file -the path to the file
         @param s -the json you want to write
 	**/
-    public static function write(file:String,s:Dynamic){
-        var content = Json.stringify(s);        
+    public static function write(file:String,s:Dynamic){      
         if(!canRead(file)){return;}
         try{
             var a = sys.io.File.write(file);
-            a.writeString(content);
+            a.writeString(Json.stringify(s));
             a.close();
         }catch(e:Dynamic){
             trace(e);
