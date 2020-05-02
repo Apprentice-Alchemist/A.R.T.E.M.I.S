@@ -1,7 +1,7 @@
 package;
 
-import com.raidandfade.haxicord.types.DMChannel;
-import com.raidandfade.haxicord.types.User;
+import haxicord.types.DMChannel;
+import haxicord.types.User;
 
 class BotError{
     public static var last_error:BotError;

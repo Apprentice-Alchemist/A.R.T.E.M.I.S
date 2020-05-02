@@ -1,5 +1,12 @@
 package lib;
 
+import js.html.idb.Database;
+import haxe.crypto.Hmac;
+import haxicord.endpoints.Endpoints;
+import js.lib.webassembly.CompileError;
+import haxe.macro.Compiler;
+import haxicord.types.structs.Embed;
+import haxicord.types.Channel;
 import haxe.Json;
 
 class Settings {
@@ -48,11 +55,30 @@ class Logger{
 	public static function setTrace() {
 		oldTrace = haxe.Log.trace;
 		haxe.Log.trace = function(v, ?infos) {
+			
 			addLog("[" + Date.now().toString() + "] " + v, infos);
 			oldTrace("[" + Date.now().toString() + "] " + v, infos);
 		}
 	}  
+	public static function sendErrorToWebhook(err:String){
+		var webhook:String = "https://discordapp.com/api/webhooks/705025393601675275/EdFYmO9qqhRce-nOZRbwBHFWl0x_WPYOJ9kKNTcxorJ69cFDi3SNBoNoWN3te3NT9MqV";
+		var data:haxicord.endpoints.Typedefs.WebhookMessage = {
+				embeds: new Array<Embed>()
+		}
+		data.embeds.push({color: 0x00ff00,title: "New Error!",timestamp: Date.now(),description: err,author: {name: "Artemis"}});
+		var req = new haxe.Http(webhook);
+		req.setHeader("Content-Type","application-json");
+		req.setPostData(Json.stringify(data));
+		req.onStatus = function(int){
+			trace(int);
+		};
+		req.request(true);
+	}
 }
 typedef Logs = {
     logs:Array<String>
 }
+// typedef WebhookMessage = {
+// 	@:optional var content:String;
+// 	@:optional var embeds:Array<Embed>;
+// }

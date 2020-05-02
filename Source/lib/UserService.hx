@@ -1,7 +1,7 @@
 package lib;
 
-import com.raidandfade.haxicord.types.GuildMember;
-import com.raidandfade.haxicord.utils.DPERMS;
+import haxicord.types.GuildMember;
+import haxicord.utils.DPERMS;
 
 class UserService {
     public static function getPerms(u:GuildMember,s:String):Bool{

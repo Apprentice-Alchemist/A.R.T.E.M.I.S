@@ -1,8 +1,8 @@
 package commands;
 
 import lib.UserService;
-import com.raidandfade.haxicord.types.Message;
-import com.raidandfade.haxicord.DiscordClient;
+import haxicord.types.Message;
+import haxicord.DiscordClient;
 
 class Kick extends Command {
     override public function new(){

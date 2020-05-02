@@ -1,7 +1,7 @@
 package commands;
 
-import com.raidandfade.haxicord.DiscordClient;
-import com.raidandfade.haxicord.types.Message;
+import haxicord.DiscordClient;
+import haxicord.types.Message;
 
 class Command {
 	public function new(){}

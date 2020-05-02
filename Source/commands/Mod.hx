@@ -2,8 +2,8 @@ package commands;
 
 import haxe.Json;
 import lib.Modio;
-import com.raidandfade.haxicord.types.Message;
-import com.raidandfade.haxicord.DiscordClient;
+import haxicord.types.Message;
+import haxicord.DiscordClient;
 
 class Mod extends Command {
     public var lastMessage:Message;

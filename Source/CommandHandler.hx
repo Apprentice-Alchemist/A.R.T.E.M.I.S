@@ -1,7 +1,7 @@
 package;
 import lib.Settings.Logger;
-import com.raidandfade.haxicord.DiscordClient;
-import com.raidandfade.haxicord.types.Message;
+import haxicord.DiscordClient;
+import haxicord.types.Message;
 import commands.Command;
 import commands.*;
 

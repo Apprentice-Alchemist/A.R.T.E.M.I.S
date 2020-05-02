@@ -1,9 +1,9 @@
 -debug
 #-resource auth.json
--lib Haxicord
 -lib hscript
 -lib hxnodejs
--cp Source 
+-cp Source
+-cp Haxicord/src
 -main Bot
 -D nodejs
 -js node/bot.js

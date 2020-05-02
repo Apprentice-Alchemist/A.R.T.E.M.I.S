@@ -1,39 +1,32 @@
 package;
-import lib.EvalHandler;
-import haxe.Log;
-import com.raidandfade.haxicord.endpoints.Typedefs.GetGuildFilter;
-import com.raidandfade.haxicord.endpoints.Endpoints;
-import js.node.net.Socket;
-import com.raidandfade.haxicord.utils.DPERMS;
-import lib.Modio;
-import haxe.Timer;
-import com.raidandfade.haxicord.types.Guild;
-import com.raidandfade.haxicord.types.GuildMember;
-import com.raidandfade.haxicord.DiscordClient;
+import haxicord.utils.DPERMS;
+import haxicord.types.Guild;
+import haxicord.types.GuildMember;
+import haxicord.DiscordClient;
 
 class Bot {
-	public static var hasStartedBefore:Bool = false;
+	public static inline var VERSION:String = "0.0.1";
 	public static var bot:DiscordClient;
 	public static var prefix:String = "]";
 	public static var startTime:Date;
 	public static function main() {
-		if(!hasStartedBefore){
-		hasStartedBefore = true;
-		EvalHandler.init();
-		lib.Settings.Logger.logs = lib.Settings.Logger.getLogData();
+		lib.EvalHandler.init();
 		lib.Settings.Logger.setTrace();
-		}
-		try{
+		start();
+				
+	}
+	public static function start(){
 		bot = new DiscordClient(getToken());
 		bot.onReady = onReady;
 		bot.onMessage = MessageHandler.handle;
 		bot.onGuildCreate = function(g) {}
 		bot.onMemberJoin = onMemberJoin;
-		}catch(e:Dynamic){trace("Fatal Error : " + e); Bot.main();}
-		
-	}	
-	public static function onDelay(){haxe.Timer.delay(onDelay,10000);}
-	public static function onReady() {trace("Ready!"); trace("Invite link : " + bot.getInviteLink(DPERMS.ADMINISTRATOR));}
+	}
+	public static function onReady() {
+		trace("Ready!"); 
+		trace("Invite link : " + bot.getInviteLink(DPERMS.ADMINISTRATOR));
+		Bot.bot.sendMessage("704748213655175300",{embed:{author: {name: "Artemis v" + VERSION,icon_url: Bot.bot.user.avatarUrl},description: "Artemis v" + VERSION + " initialised.",timestamp: Date.now(),}});
+	}
 	public static function onMemberJoin(g:Guild, m:GuildMember) {}
 	public static function getToken(){
 		if (lib.JsonHandler.canRead("auth.json")){
