@@ -77,7 +77,9 @@ typedef MessageCreate = {
      */
     @:optional var tts:Bool;
 
-    //UNFINISHED. CANNOT SEND FILES YET
+    /** 
+        UNFINISHED. CANNOT SEND FILES YET
+    **/
     @:optional var file:String; 
 }
 

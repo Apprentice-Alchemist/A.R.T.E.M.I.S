@@ -1,5 +1,6 @@
 package haxicord.shardmaster;
 
+import haxe.Http;
 import haxicord.logger.Logger;
 
 import haxicord.endpoints.Endpoints;
@@ -34,6 +35,8 @@ class Sharder{
 
         try{
             Https.makeRequest(url, "GET", cb, {}, headers, false);
+            
+
         }catch(e:Dynamic) {
             trace(e);
             trace(haxe.CallStack.toString(haxe.CallStack.exceptionStack() ) );

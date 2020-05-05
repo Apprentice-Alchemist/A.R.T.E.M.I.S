@@ -1,8 +1,7 @@
 package haxicord.endpoints;
 
-import haxe.Json;
+import haxe.Http;
 import haxe.Timer;
-import haxe.Utf8;
 import haxicord.utils.Https;
 
 //TODO https://discordapp.com/developers/docs/resources/emoji maybe add these lol
@@ -1386,6 +1385,11 @@ class Endpoints{
 
         try{
             Https.makeRequest(url, method, latency_cb, data, headers, false);
+			var thing = new Http(url);
+			for (o in headers) {
+				thing.setHeader(o, headers.get(o));
+            }
+            // thing.onData
         }catch(e:Dynamic) {
             trace(e);
             trace(haxe.CallStack.toString(haxe.CallStack.exceptionStack() ) );

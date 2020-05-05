@@ -12,9 +12,36 @@ var Bot = function() { };
 $hxClasses["Bot"] = Bot;
 Bot.__name__ = true;
 Bot.main = function() {
-	lib_EvalHandler.init();
-	lib_Logger.setTrace();
-	Bot.start();
+	try {
+		haxe_MainLoop.add(Bot.tock);
+		Bot.__init();
+	} catch( e ) {
+		haxe_CallStack.lastException = e;
+		haxe_Log.trace("Possibly Fatal Error. " + Std.string(((e) instanceof js__$Boot_HaxeError) ? e.val : e) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Source/Bot.hx", lineNumber : 21, className : "Bot", methodName : "main"});
+	}
+};
+Bot.__init = function() {
+	try {
+		lib_EvalHandler.init();
+	} catch( e ) {
+		haxe_CallStack.lastException = e;
+		haxe_Log.trace("Error in evalhandler. " + Std.string(((e) instanceof js__$Boot_HaxeError) ? e.val : e) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Source/Bot.hx", lineNumber : 29, className : "Bot", methodName : "__init"});
+	}
+	try {
+		lib_Logger.logs = lib_Logger.getLogData();
+		lib_Logger.setTrace();
+	} catch( e1 ) {
+		haxe_CallStack.lastException = e1;
+		haxe_Log.trace("Error in logger. " + Std.string(((e1) instanceof js__$Boot_HaxeError) ? e1.val : e1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Source/Bot.hx", lineNumber : 35, className : "Bot", methodName : "__init"});
+	}
+	try {
+		Bot.start();
+	} catch( e2 ) {
+		haxe_CallStack.lastException = e2;
+		haxe_Log.trace("Error in start. " + Std.string(((e2) instanceof js__$Boot_HaxeError) ? e2.val : e2) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Source/Bot.hx", lineNumber : 40, className : "Bot", methodName : "__init"});
+	}
+};
+Bot.tock = function() {
 };
 Bot.start = function() {
 	Bot.bot = new haxicord_DiscordClient(Bot.getToken());
@@ -25,8 +52,8 @@ Bot.start = function() {
 	Bot.bot.onMemberJoin = Bot.onMemberJoin;
 };
 Bot.onReady = function() {
-	haxe_Log.trace("Ready!",{ fileName : "Source/Bot.hx", lineNumber : 26, className : "Bot", methodName : "onReady"});
-	haxe_Log.trace("Invite link : " + Bot.bot.getInviteLink(haxicord_utils_DPERMS.ADMINISTRATOR),{ fileName : "Source/Bot.hx", lineNumber : 27, className : "Bot", methodName : "onReady"});
+	haxe_Log.trace("Ready!",{ fileName : "Source/Bot.hx", lineNumber : 52, className : "Bot", methodName : "onReady"});
+	haxe_Log.trace("Invite link : " + Bot.bot.getInviteLink(haxicord_utils_DPERMS.ADMINISTRATOR),{ fileName : "Source/Bot.hx", lineNumber : 53, className : "Bot", methodName : "onReady"});
 	Bot.bot.sendMessage("704748213655175300",{ embed : { author : { name : "Artemis v" + "0.0.1", icon_url : Bot.bot.user.avatarUrl}, description : "Artemis v" + "0.0.1" + " initialised.", timestamp : new Date()}});
 };
 Bot.onMemberJoin = function(g,m) {
@@ -82,7 +109,7 @@ CommandHandler.handle = function(m) {
 	}
 	if(m.content.substring(0,Bot.prefix.length) == Bot.prefix) {
 		var command = m.content.substring(Bot.prefix.length,m.content.indexOf(" ") > 0 ? m.content.indexOf(" ") : m.content.length);
-		haxe_Log.trace(command,{ fileName : "Source/CommandHandler.hx", lineNumber : 42, className : "CommandHandler", methodName : "handle"});
+		haxe_Log.trace(command,{ fileName : "Source/CommandHandler.hx", lineNumber : 45, className : "CommandHandler", methodName : "handle"});
 		switch(command) {
 		case "eval":
 			CommandHandler.eval(m);
@@ -135,11 +162,6 @@ CommandHandler.eval = function(m) {
 	} else {
 		return;
 	}
-};
-CommandHandler.parseArgs = function(m,n) {
-	var tmp = HxOverrides.substr(m.content,m.content.indexOf(" "),null);
-	var args = tmp.split("\" \"");
-	return args;
 };
 var DateTools = function() { };
 $hxClasses["DateTools"] = DateTools;
@@ -320,9 +342,7 @@ IntIterator.prototype = {
 	,__class__: IntIterator
 };
 Math.__name__ = true;
-var MessageHandler = function(_bot) {
-	this.bot = _bot;
-};
+var MessageHandler = function() { };
 $hxClasses["MessageHandler"] = MessageHandler;
 MessageHandler.__name__ = true;
 MessageHandler.handle = function(m) {
@@ -332,26 +352,6 @@ MessageHandler.handle = function(m) {
 	} else {
 		return;
 	}
-};
-MessageHandler.handleMessage = function(m) {
-	var content = m.content;
-	if(content.toLowerCase().indexOf("good bot") != -1) {
-		m.reply({ content : "Thanks, I do my best!"});
-		haxe_Log.trace("message handled",{ fileName : "Source/MessageHandler.hx", lineNumber : 26, className : "MessageHandler", methodName : "handleMessage"});
-		return true;
-	} else if(content.toLowerCase().indexOf("bad bot") != -1) {
-		m.reply({ content : "Sorry, I'll do better next time."});
-		haxe_Log.trace("message handled",{ fileName : "Source/MessageHandler.hx", lineNumber : 30, className : "MessageHandler", methodName : "handleMessage"});
-		return true;
-	} else if(m.mentions.lastIndexOf(Bot.bot.user) != null) {
-		m.reply({ content : "Hello, did you call me? If you want to know what I can do type `]help`!"});
-		return true;
-	}
-	haxe_Log.trace("message handled",{ fileName : "Source/MessageHandler.hx", lineNumber : 36, className : "MessageHandler", methodName : "handleMessage"});
-	return false;
-};
-MessageHandler.prototype = {
-	__class__: MessageHandler
 };
 var Reflect = function() { };
 $hxClasses["Reflect"] = Reflect;
@@ -581,76 +581,63 @@ haxe_io_Output.prototype = {
 	}
 	,__class__: haxe_io_Output
 };
-var _$Sys_FileOutput = function(fd) {
-	this.fd = fd;
-};
-$hxClasses["_Sys.FileOutput"] = _$Sys_FileOutput;
-_$Sys_FileOutput.__name__ = true;
-_$Sys_FileOutput.__super__ = haxe_io_Output;
-_$Sys_FileOutput.prototype = $extend(haxe_io_Output.prototype,{
-	writeByte: function(c) {
-		js_node_Fs.writeSync(this.fd,String.fromCodePoint(c));
-	}
-	,writeBytes: function(s,pos,len) {
-		var data = s.b;
-		return js_node_Fs.writeSync(this.fd,js_node_buffer_Buffer.from(data.buffer,data.byteOffset,s.length),pos,len);
-	}
-	,writeString: function(s,encoding) {
-		js_node_Fs.writeSync(this.fd,s);
-	}
-	,flush: function() {
-		js_node_Fs.fsyncSync(this.fd);
-	}
-	,close: function() {
-		js_node_Fs.closeSync(this.fd);
-	}
-	,__class__: _$Sys_FileOutput
-});
 var haxe_io_Input = function() { };
 $hxClasses["haxe.io.Input"] = haxe_io_Input;
 haxe_io_Input.__name__ = true;
-var _$Sys_FileInput = function(fd) {
-	this.fd = fd;
-};
-$hxClasses["_Sys.FileInput"] = _$Sys_FileInput;
-_$Sys_FileInput.__name__ = true;
-_$Sys_FileInput.__super__ = haxe_io_Input;
-_$Sys_FileInput.prototype = $extend(haxe_io_Input.prototype,{
+haxe_io_Input.prototype = {
 	readByte: function() {
-		var buf = js_node_buffer_Buffer.alloc(1);
-		try {
-			js_node_Fs.readSync(this.fd,buf,0,1,null);
-		} catch( e ) {
-			haxe_CallStack.lastException = e;
-			var e1 = ((e) instanceof js__$Boot_HaxeError) ? e.val : e;
-			if(e1.code == "EOF") {
-				throw new js__$Boot_HaxeError(new haxe_io_Eof());
-			} else {
-				throw new js__$Boot_HaxeError(haxe_io_Error.Custom(e1));
-			}
-		}
-		return buf[0];
+		throw new js__$Boot_HaxeError("Not implemented");
 	}
 	,readBytes: function(s,pos,len) {
-		var data = s.b;
-		var buf = js_node_buffer_Buffer.from(data.buffer,data.byteOffset,s.length);
+		var k = len;
+		var b = s.b;
+		if(pos < 0 || len < 0 || pos + len > s.length) {
+			throw new js__$Boot_HaxeError(haxe_io_Error.OutsideBounds);
+		}
 		try {
-			return js_node_Fs.readSync(this.fd,buf,pos,len,null);
+			while(k > 0) {
+				b[pos] = this.readByte();
+				++pos;
+				--k;
+			}
+		} catch( eof ) {
+			haxe_CallStack.lastException = eof;
+			var eof1 = ((eof) instanceof js__$Boot_HaxeError) ? eof.val : eof;
+			if(((eof1) instanceof haxe_io_Eof)) {
+				var eof2 = eof1;
+			} else {
+				throw eof;
+			}
+		}
+		return len - k;
+	}
+	,readAll: function(bufsize) {
+		if(bufsize == null) {
+			bufsize = 16384;
+		}
+		var buf = new haxe_io_Bytes(new ArrayBuffer(bufsize));
+		var total = new haxe_io_BytesBuffer();
+		try {
+			while(true) {
+				var len = this.readBytes(buf,0,bufsize);
+				if(len == 0) {
+					throw new js__$Boot_HaxeError(haxe_io_Error.Blocked);
+				}
+				total.addBytes(buf,0,len);
+			}
 		} catch( e ) {
 			haxe_CallStack.lastException = e;
 			var e1 = ((e) instanceof js__$Boot_HaxeError) ? e.val : e;
-			if(e1.code == "EOF") {
-				throw new js__$Boot_HaxeError(new haxe_io_Eof());
+			if(((e1) instanceof haxe_io_Eof)) {
+				var e2 = e1;
 			} else {
-				throw new js__$Boot_HaxeError(haxe_io_Error.Custom(e1));
+				throw e;
 			}
 		}
+		return total.getBytes();
 	}
-	,close: function() {
-		js_node_Fs.closeSync(this.fd);
-	}
-	,__class__: _$Sys_FileInput
-});
+	,__class__: haxe_io_Input
+};
 var Type = function() { };
 $hxClasses["Type"] = Type;
 Type.__name__ = true;
@@ -711,9 +698,6 @@ commands_Command.__name__ = true;
 commands_Command.prototype = {
 	shortHelp: function() {
 		return this.shorthelp;
-	}
-	,longHelp: function() {
-		return this.longhelp;
 	}
 	,_call: function(m,b) {
 	}
@@ -960,49 +944,6 @@ haxe_DateUtils.fromISO8601 = function(iso) {
 	var date = new Date(year,month - 1,day,hour,minute,second);
 	var properd = new Date(date.getTime() + fraction);
 	return properd;
-};
-haxe_DateUtils.toISO8601 = function(d) {
-	var y = "" + d.getFullYear();
-	var mo = "" + (d.getMonth() + 1);
-	var da = "" + d.getDate();
-	var h = "" + d.getHours();
-	var m = "" + d.getMinutes();
-	var s = "" + d.getSeconds();
-	var ms = "" + d.getTime() % 1000;
-	if(mo.length == 1) {
-		mo = "0" + mo;
-	}
-	if(da.length == 1) {
-		da = "0" + da;
-	}
-	if(h.length == 1) {
-		h = "0" + h;
-	}
-	if(m.length == 1) {
-		m = "0" + m;
-	}
-	if(s.length == 1) {
-		s = "0" + s;
-	}
-	if(ms.length == 1) {
-		ms = "00" + ms;
-	}
-	if(ms.length == 2) {
-		ms = "0" + ms;
-	}
-	var str = y + "-" + mo + "-" + da + "T" + h + ":" + m + ":" + s + "." + ms + "Z";
-	return str;
-};
-haxe_DateUtils.getTimezoneOffset = function() {
-	return new Date(null,null,null,null,null,null).getTimezoneOffset() * 60;
-};
-haxe_DateUtils.utcNow = function() {
-	var d = new Date();
-	var time = d.getTime() + haxe_DateUtils.getTimezoneOffset() * 1000;
-	var utcDate = new Date(time);
-	return utcDate;
-};
-haxe_DateUtils.main = function() {
 };
 var haxe_EntryPoint = function() { };
 $hxClasses["haxe.EntryPoint"] = haxe_EntryPoint;
@@ -1398,9 +1339,6 @@ haxe_ds_IntMap.prototype = {
 	}
 	,__class__: haxe_ds_IntMap
 };
-var haxe_ds_List = function() { };
-$hxClasses["haxe.ds.List"] = haxe_ds_List;
-haxe_ds_List.__name__ = true;
 var haxe_ds_ObjectMap = function() {
 	this.h = { __keys__ : { }};
 };
@@ -1543,10 +1481,6 @@ haxe_http_HttpBase.prototype = {
 	}
 	,addParameter: function(name,value) {
 		this.params.push({ name : name, value : value});
-	}
-	,setPostData: function(data) {
-		this.postData = data;
-		this.postBytes = null;
 	}
 	,onData: function(data) {
 	}
@@ -1765,6 +1699,9 @@ haxe_io_Bytes.prototype = {
 		}
 		return s;
 	}
+	,toString: function() {
+		return this.getString(0,this.length);
+	}
 	,toHex: function() {
 		var s_b = "";
 		var chars = [];
@@ -1822,6 +1759,14 @@ haxe_io_BytesBuffer.prototype = {
 		this.u8 = nu8;
 		this.view = new DataView(this.buffer);
 	}
+	,getBytes: function() {
+		if(this.size == 0) {
+			return new haxe_io_Bytes(new ArrayBuffer(0));
+		}
+		var b = new haxe_io_Bytes(this.buffer);
+		b.length = this.pos;
+		return b;
+	}
 	,__class__: haxe_io_BytesBuffer
 };
 var haxe_io_Encoding = $hxEnums["haxe.io.Encoding"] = { __ename__ : true, __constructs__ : ["UTF8","RawNative"]
@@ -1860,20 +1805,10 @@ haxe_net_WebSocket.create = function(url,protocols,origin,debug) {
 	}
 	return new haxe_net_impl_WebSocketNodejs(url);
 };
-haxe_net_WebSocket.defer = function(callback) {
-	haxe_Timer.delay(callback,0);
-};
 haxe_net_WebSocket.prototype = {
-	process: function() {
-	}
-	,sendString: function(message) {
-	}
-	,sendBytes: function(message) {
+	sendString: function(message) {
 	}
 	,close: function() {
-	}
-	,get_readyState: function() {
-		return haxe_net_ReadyState.Closed;
 	}
 	,onopen: function() {
 	}
@@ -1886,7 +1821,6 @@ haxe_net_WebSocket.prototype = {
 	,onclose: function(code) {
 	}
 	,__class__: haxe_net_WebSocket
-	,__properties__: {get_readyState:"get_readyState"}
 };
 var haxe_net_impl_NodeJsWS = require("ws");
 var haxe_net_impl_WebSocketNodejs = function(url,options) {
@@ -1922,36 +1856,11 @@ haxe_net_impl_WebSocketNodejs.prototype = $extend(haxe_net_WebSocket.prototype,{
 	sendString: function(message) {
 		this.impl.send(message);
 	}
-	,sendBytes: function(message) {
-		this.impl.send(message.b.bufferValue);
-	}
 	,close: function() {
 		this.impl.close();
 	}
-	,get_readyState: function() {
-		switch(this.impl.readyState) {
-		case 0:
-			return haxe_net_ReadyState.Connecting;
-		case 1:
-			return haxe_net_ReadyState.Open;
-		case 2:
-			return haxe_net_ReadyState.Closing;
-		case 3:
-			return haxe_net_ReadyState.Closed;
-		default:
-			throw new js__$Boot_HaxeError("Unexpected websocket state");
-		}
-	}
 	,__class__: haxe_net_impl_WebSocketNodejs
 });
-var haxe_zip_Uncompress = function() { };
-$hxClasses["haxe.zip.Uncompress"] = haxe_zip_Uncompress;
-haxe_zip_Uncompress.__name__ = true;
-haxe_zip_Uncompress.run = function(src,bufsize) {
-	var data = src.b;
-	var buffer = js_node_Zlib.inflateSync(js_node_buffer_Buffer.from(data.buffer,data.byteOffset,src.length),bufsize == null ? { } : { chunkSize : bufsize});
-	return js_node_buffer__$Buffer_Helper.bytesOfBuffer(buffer);
-};
 var haxicord_DiscordClient = $hx_exports["haxicord"]["DiscordClient"] = function(_tkn,_shardInfo,_etf,_zlib,_storage) {
 	if(_zlib == null) {
 		_zlib = true;
@@ -1981,7 +1890,7 @@ var haxicord_DiscordClient = $hx_exports["haxicord"]["DiscordClient"] = function
 	} else {
 		this.dataCache = _storage;
 	}
-	haxe_Log.trace("Starting Client",{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 155, className : "haxicord.DiscordClient", methodName : "new"});
+	haxe_Log.trace("Starting Client",{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 153, className : "haxicord.DiscordClient", methodName : "new"});
 	this.endpoints.getGateway(this.isBot,$bind(this,this.connect));
 	haxe_MainLoop.add($bind(this,this.tick));
 };
@@ -1990,12 +1899,10 @@ haxicord_DiscordClient.__name__ = true;
 haxicord_DiscordClient.prototype = {
 	tick: function() {
 	}
-	,start: function() {
-	}
 	,connect: function(gateway,error) {
 		var _gthis = this;
 		try {
-			haxe_Log.trace("Connecting",{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 176, className : "haxicord.DiscordClient", methodName : "connect"});
+			haxe_Log.trace("Connecting",{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 167, className : "haxicord.DiscordClient", methodName : "connect"});
 			if(error != null) {
 				throw js__$Boot_HaxeError.wrap(error);
 			}
@@ -2020,24 +1927,17 @@ haxicord_DiscordClient.prototype = {
 				if(_gthis.session == "") {
 					_gthis.resumeable = false;
 				}
-				haxe_Log.trace("Socket Closed with code " + m + ", Re-Opening in " + _gthis.reconnectTimeout + "s. " + (_gthis.resumeable ? "Resuming" : ""),{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 205, className : "haxicord.DiscordClient", methodName : "connect"});
-				var f = $bind(_gthis,_gthis.connect);
-				var gateway1 = gateway;
-				var error1 = error;
-				haxe_Timer.delay(function() {
-					f(gateway1,error1);
-					return;
-				},_gthis.reconnectTimeout * 1000);
-				_gthis.reconnectTimeout = Math.floor(Math.min(_gthis.reconnectTimeout * 2,300));
+				haxe_Log.trace("Socket Closed with code " + m + ", Re-Opening in " + _gthis.reconnectTimeout + "s. " + (_gthis.resumeable ? "Resuming" : ""),{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 198, className : "haxicord.DiscordClient", methodName : "connect"});
+				Bot.start();
 			};
 			this.ws.onError = function(e) {
 				_gthis.resumeable = false;
-				haxe_Log.trace("Websocket errored!",{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 214, className : "haxicord.DiscordClient", methodName : "connect"});
-				haxe_Log.trace(e,{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 215, className : "haxicord.DiscordClient", methodName : "connect"});
+				haxe_Log.trace("Websocket errored!",{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 206, className : "haxicord.DiscordClient", methodName : "connect"});
+				haxe_Log.trace(e,{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 207, className : "haxicord.DiscordClient", methodName : "connect"});
 			};
 		} catch( e1 ) {
 			haxe_CallStack.lastException = e1;
-			haxe_Log.trace(((e1) instanceof js__$Boot_HaxeError) ? e1.val : e1,{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 218, className : "haxicord.DiscordClient", methodName : "connect"});
+			haxe_Log.trace(((e1) instanceof js__$Boot_HaxeError) ? e1.val : e1,{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 210, className : "haxicord.DiscordClient", methodName : "connect"});
 		}
 	}
 	,sendWs: function(d) {
@@ -2058,7 +1958,7 @@ haxicord_DiscordClient.prototype = {
 				this.receiveEvent(m);
 				break;
 			case 9:
-				haxe_Log.trace("Session was invalidated, killing.",{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 254, className : "haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
+				haxe_Log.trace("Session was invalidated, killing.",{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 246, className : "haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
 				this.resumeable = !m.d;
 				this.ws.close();
 				break;
@@ -2083,8 +1983,8 @@ haxicord_DiscordClient.prototype = {
 		} catch( er ) {
 			haxe_CallStack.lastException = er;
 			var er1 = ((er) instanceof js__$Boot_HaxeError) ? er.val : er;
-			haxe_Log.trace("UNCAUGHT ERROR IN EVENT CALLBACK.",{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 263, className : "haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
-			haxe_Log.trace(Std.string(er1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 264, className : "haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
+			haxe_Log.trace("UNCAUGHT ERROR IN EVENT CALLBACK.",{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 255, className : "haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
+			haxe_Log.trace(Std.string(er1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 256, className : "haxicord.DiscordClient", methodName : "handleWebSocketMessage"});
 		}
 	}
 	,receiveEvent: function(m) {
@@ -2303,7 +2203,7 @@ haxicord_DiscordClient.prototype = {
 		case "WEBHOOKS_UPDATE":
 			break;
 		default:
-			haxe_Log.trace("Unhandled event " + m.t,{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 429, className : "haxicord.DiscordClient", methodName : "receiveEvent"});
+			haxe_Log.trace("Unhandled event " + m.t,{ fileName : "Haxicord/src/haxicord/DiscordClient.hx", lineNumber : 421, className : "haxicord.DiscordClient", methodName : "receiveEvent"});
 		}
 	}
 	,setStatus: function(status) {
@@ -2829,14 +2729,8 @@ haxicord_cachehandler_MemoryCache.prototype = {
 	,delChannel: function(id) {
 		this.channelCache.remove(id);
 	}
-	,delDMChannel: function(id) {
-		this.dmChannelCache.remove(id);
-	}
 	,delGuild: function(id) {
 		this.guildCache.remove(id);
-	}
-	,delUserDMChannel: function(id) {
-		this.userDMChannels.remove(id);
 	}
 	,getMessage: function(id) {
 		return this.messageCache.get(id);
@@ -2913,116 +2807,6 @@ haxicord_endpoints_Endpoints.prototype = {
 			}
 		});
 	}
-	,createChannel: function(guild_id,channel_data,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/channels",[guild_id]);
-		this.callEndpoint("POST",endpoint,cb,channel_data);
-	}
-	,modifyChannel: function(channel_id,channel_data,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}",[channel_id]);
-		this.callEndpoint("PATCH",endpoint,function(ch,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var tmp = _gthis.client._newChannel(ch);
-				cb(tmp,null);
-			}
-		},channel_data);
-	}
-	,deleteChannel: function(channel_id,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}",[channel_id]);
-		this.callEndpoint("DELETE",endpoint,function(ch,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var tmp = _gthis.client._newChannel(ch);
-				cb(tmp,null);
-			}
-		});
-	}
-	,editChannelPermissions: function(channel_id,overwrite_id,new_permission,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/permissions/{1}",[channel_id,overwrite_id]);
-		this.callEndpoint("PUT",endpoint,cb,new_permission);
-	}
-	,deleteChannelPermission: function(channel_id,overwrite_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/permissions/{1}",[channel_id,overwrite_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,getChannelInvites: function(channel_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/invites",[channel_id]);
-		this.callEndpoint("GET",endpoint,cb);
-	}
-	,createChannelInvite: function(channel_id,invite,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/invites",[channel_id]);
-		this.callEndpoint("POST",endpoint,cb,invite);
-	}
-	,getChannelPins: function(channel_id,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/pins",[channel_id]);
-		this.callEndpoint("GET",endpoint,function(r,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var _g = [];
-				var _g1 = 0;
-				while(_g1 < r.length) {
-					var m = r[_g1];
-					++_g1;
-					_g.push(_gthis.client._newMessage(m));
-				}
-				var msgs = _g;
-				cb(msgs,null);
-			}
-		});
-	}
-	,addChannelPin: function(channel_id,message_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/pins/{1}",[channel_id,message_id]);
-		this.callEndpoint("PUT",endpoint,cb,"");
-	}
-	,deleteChannelPin: function(channel_id,message_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/pins/{1}",[channel_id,message_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,groupDMAddRecipient: function(channel_id,user_id,access_token,nick,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/recipients/{1}",[channel_id,user_id]);
-		this.callEndpoint("PUT",endpoint,cb,{ "access_token" : access_token, "nick" : nick});
-	}
-	,groupDMRemoveRecipient: function(channel_id,user_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/recipients/{1}",[channel_id,user_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,getMessages: function(channel_id,format,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/messages{1}",[channel_id,haxicord_utils_Https.queryString(format)]);
-		this.callEndpoint("GET",endpoint,function(r,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var _g = [];
-				var _g1 = 0;
-				while(_g1 < r.length) {
-					var m = r[_g1];
-					++_g1;
-					_g.push(_gthis.client._newMessage(m));
-				}
-				var msgs = _g;
-				cb(msgs,null);
-			}
-		});
-	}
 	,getMessage: function(channel_id,message_id,cb) {
 		var _gthis = this;
 		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/messages/{1}",[channel_id,message_id]);
@@ -3052,73 +2836,6 @@ haxicord_endpoints_Endpoints.prototype = {
 				cb(tmp,null);
 			}
 		},message);
-	}
-	,startTyping: function(channel_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/typing",[channel_id]);
-		this.callEndpoint("POST",endpoint,cb,{ });
-	}
-	,editMessage: function(channel_id,message_id,message,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/messages/{1}",[channel_id,message_id]);
-		this.callEndpoint("PATCH",endpoint,function(m,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var tmp = _gthis.client._newMessage(m);
-				cb(tmp,null);
-			}
-		},message);
-	}
-	,deleteMessage: function(channel_id,message_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/messages/{1}",[channel_id,message_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,deleteMessages: function(channel_id,message_ids,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/messages/bulk-delete",[channel_id]);
-		this.callEndpoint("POST",endpoint,cb,message_ids);
-	}
-	,createReaction: function(channel_id,message_id,emoji,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/messages/{1}/reactions/{2}/@me",[channel_id,message_id,emoji]);
-		this.callEndpoint("PUT",endpoint,cb);
-	}
-	,deleteOwnReaction: function(channel_id,message_id,emoji,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/messages/{1}/reactions/{2}/@me",[channel_id,message_id,emoji]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,deleteUserReaction: function(channel_id,message_id,user_id,emoji,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/messages/{1}/reactions/{2}/{3}",[channel_id,message_id,emoji,user_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,getReactions: function(channel_id,message_id,emoji,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/messages/{1}/reactions/{2}",[channel_id,message_id,emoji]);
-		this.callEndpoint("GET",endpoint,cb);
-	}
-	,listEmojis: function(guild_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/emojis",[guild_id]);
-		this.callEndpoint("GET",endpoint,cb);
-	}
-	,getEmoji: function(guild_id,emoji_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/emojis/{1}",[guild_id,emoji_id]);
-		this.callEndpoint("GET",endpoint,cb);
-	}
-	,createEmoji: function(guild_id,emoji,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/emojis",[guild_id]);
-		this.callEndpoint("POST",endpoint,cb,emoji);
-	}
-	,modifyEmoji: function(guild_id,emoji_id,emoji,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/emojis/{1}",[guild_id,emoji_id]);
-		this.callEndpoint("PATCH",endpoint,cb,emoji);
-	}
-	,removeEmoji: function(guild_id,emoji_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/emojis/{1}",[guild_id,emoji_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,deleteAllReactions: function(channel_id,message_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/messages/{1}/reactions",[channel_id,message_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
 	}
 	,createGuild: function(guild_data,cb) {
 		var _gthis = this;
@@ -3150,85 +2867,6 @@ haxicord_endpoints_Endpoints.prototype = {
 			}
 		});
 	}
-	,getAuditLogs: function(guild_id,filter,cb) {
-		if(filter == null) {
-			filter = { };
-		}
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/audit-logs{1}",[guild_id,haxicord_utils_Https.queryString(filter)]);
-		this.callEndpoint("GET",endpoint,function(al,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				cb(al,null);
-			}
-		});
-	}
-	,modifyGuild: function(guild_id,guild_data,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}",[guild_id]);
-		this.callEndpoint("PATCH",endpoint,function(g,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var tmp = _gthis.client._newGuild(g);
-				cb(tmp,null);
-			}
-		},guild_data);
-	}
-	,deleteGuild: function(guild_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}",[guild_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,getChannels: function(guild_id,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/channels",[guild_id]);
-		this.callEndpoint("GET",endpoint,function(r,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var _g = [];
-				var _g1 = 0;
-				while(_g1 < r.length) {
-					var c = r[_g1];
-					++_g1;
-					_g.push(_gthis.client._newChannel(c));
-				}
-				var channels = _g;
-				cb(channels,null);
-			}
-		});
-	}
-	,moveChannel: function(guild_id,changes,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/channels",[guild_id]);
-		this.callEndpoint("PATCH",endpoint,function(r,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var _g = [];
-				var _g1 = 0;
-				while(_g1 < r.length) {
-					var c = r[_g1];
-					++_g1;
-					_g.push(_gthis.client._newChannel(c));
-				}
-				var channels = _g;
-				cb(channels,null);
-			}
-		});
-	}
 	,getGuildMember: function(guild_id,user_id,cb) {
 		var _gthis = this;
 		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/members/{1}",[guild_id,user_id]);
@@ -3241,260 +2879,12 @@ haxicord_endpoints_Endpoints.prototype = {
 			}
 		});
 	}
-	,getGuildMembers: function(guild_id,format,cb) {
-		var _gthis = this;
-		var endpoint = haxicord_utils_Https.queryString(format);
-		var endpoint1 = new haxicord_endpoints_EndpointPath("/guilds/{0}/members{1}",[guild_id,endpoint]);
-		this.callEndpoint("GET",endpoint1,function(r,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var _g = [];
-				var _g1 = 0;
-				while(_g1 < r.length) {
-					var gm = r[_g1];
-					++_g1;
-					_g.push(_gthis.client.getGuildUnsafe(guild_id)._newMember(gm));
-				}
-				var members = _g;
-				cb(members,null);
-			}
-		});
-	}
-	,addGuildMember: function(guild_id,user_id,member_data,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/members/{1}",[guild_id,user_id]);
-		this.callEndpoint("PUT",endpoint,function(gm,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var tmp = _gthis.client.getGuildUnsafe(guild_id)._newMember(gm);
-				cb(tmp,null);
-			}
-		},member_data);
-	}
-	,editGuildMember: function(guild_id,user_id,member_data,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/members/{1}",[guild_id,user_id]);
-		this.callEndpoint("PATCH",endpoint,cb,member_data);
-	}
-	,changeNickname: function(guild_id,nickname,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/members/@me/nick",[guild_id]);
-		this.callEndpoint("PATCH",endpoint,cb,{ nick : nickname});
-	}
-	,giveMemberRole: function(guild_id,user_id,role_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/members/{1}/roles/{2}",[guild_id,user_id,role_id]);
-		this.callEndpoint("PUT",endpoint,cb,{ });
-	}
-	,takeMemberRole: function(guild_id,user_id,role_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/members/{1}/roles/{2}",[guild_id,user_id,role_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
 	,kickMember: function(guild_id,user_id,reason,cb) {
 		if(reason == null) {
 			reason = "";
 		}
 		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/members/{1}?reason={2}",[guild_id,user_id,reason]);
 		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,getGuildBans: function(guild_id,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/bans",[guild_id]);
-		this.callEndpoint("GET",endpoint,function(r,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var _g = [];
-				var _g1 = 0;
-				while(_g1 < r.length) {
-					var gm = r[_g1];
-					++_g1;
-					_g.push(_gthis.client._newUser(gm));
-				}
-				var users = _g;
-				cb(users,null);
-			}
-		});
-	}
-	,banMember: function(guild_id,user_id,days,reason,cb) {
-		if(reason == null) {
-			reason = "";
-		}
-		if(days == null) {
-			days = 7;
-		}
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/bans/{1}?delete-message-days={2}&reason={3}",[guild_id,user_id,days == null ? "null" : "" + days,reason]);
-		this.callEndpoint("PUT",endpoint,cb,{ });
-	}
-	,unbanMember: function(guild_id,user_id,reason,cb) {
-		if(reason == null) {
-			reason = "";
-		}
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/bans/{1}",[guild_id,user_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,getGuildRoles: function(guild_id,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/roles",[guild_id]);
-		this.callEndpoint("GET",endpoint,function(res,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var _g = [];
-				var _g1 = 0;
-				while(_g1 < res.length) {
-					var r = res[_g1];
-					++_g1;
-					_g.push(_gthis.client.getGuildUnsafe(guild_id)._newRole(r));
-				}
-				var roles = _g;
-				cb(roles,null);
-			}
-		});
-	}
-	,createRole: function(guild_id,role_data,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/roles",[guild_id]);
-		this.callEndpoint("POST",endpoint,function(r,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var tmp = _gthis.client.getGuildUnsafe(guild_id)._newRole(r);
-				cb(tmp,null);
-			}
-		},role_data);
-	}
-	,moveRole: function(guild_id,changes,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/roles",[guild_id]);
-		this.callEndpoint("PATCH",endpoint,function(res,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var _g = [];
-				var _g1 = 0;
-				while(_g1 < res.length) {
-					var r = res[_g1];
-					++_g1;
-					_g.push(_gthis.client.getGuildUnsafe(guild_id)._newRole(r));
-				}
-				var roles = _g;
-				cb(roles,null);
-			}
-		});
-	}
-	,editRole: function(guild_id,role_id,role_data,cb) {
-		var _gthis = this;
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/roles/{1}",[guild_id,role_id]);
-		this.callEndpoint("PATCH",endpoint,function(r,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var tmp = _gthis.client.getGuildUnsafe(guild_id);
-				cb(new haxicord_types_Role(r,tmp,_gthis.client),null);
-			}
-		},role_data);
-	}
-	,deleteRole: function(guild_id,role_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/roles/{1}",[guild_id,role_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,getPruneCount: function(guild_id,days,cb) {
-		if(days == null) {
-			days = 1;
-		}
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/prune{1}",[guild_id,haxicord_utils_Https.queryString({ days : days})]);
-		this.callEndpoint("GET",endpoint,function(res,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(-1,e);
-			} else {
-				cb(res.pruned,null);
-			}
-		});
-	}
-	,beginPrune: function(guild_id,days,cb) {
-		if(days == null) {
-			days = 1;
-		}
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/prune{1}",[guild_id,haxicord_utils_Https.queryString({ days : days})]);
-		this.callEndpoint("POST",endpoint,function(res,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(-1,e);
-			} else {
-				cb(res.pruned,null);
-			}
-		});
-	}
-	,guildVoiceRegions: function(guild_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/regions",[guild_id]);
-		this.callEndpoint("GET",endpoint,function(res,e) {
-			if(cb == null) {
-				return;
-			}
-			if(e != null) {
-				cb(null,e);
-			} else {
-				cb(res,null);
-			}
-		});
-	}
-	,getIntegrations: function(guild_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/integrations",[guild_id]);
-		this.callEndpoint("GET",endpoint,cb);
-	}
-	,addIntegration: function(guild_id,int_data,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/integrations",[guild_id]);
-		this.callEndpoint("POST",endpoint,cb,int_data);
-	}
-	,editIntegration: function(guild_id,int_id,int_data,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/integrations/{1}",[guild_id,int_id]);
-		this.callEndpoint("PATCH",endpoint,cb,int_data);
-	}
-	,deleteIntegration: function(guild_id,int_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/integrations/{1}",[guild_id,int_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,syncIntegration: function(guild_id,int_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/integrations/{1}/sync",[guild_id,int_id]);
-		this.callEndpoint("POST",endpoint,cb);
-	}
-	,getWidget: function(guild_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/embed",[guild_id]);
-		this.callEndpoint("GET",endpoint,cb);
-	}
-	,modifyWidget: function(guild_id,edits,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/embed",[guild_id]);
-		this.callEndpoint("PATCH",endpoint,cb,edits);
-	}
-	,getInvites: function(guild_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/invites",[guild_id]);
-		this.callEndpoint("GET",endpoint,cb);
 	}
 	,getInvite: function(invite_code,with_counts,cb) {
 		if(with_counts == null) {
@@ -3565,10 +2955,6 @@ haxicord_endpoints_Endpoints.prototype = {
 			}
 		});
 	}
-	,leaveGuild: function(guild_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/users/@me/guilds/{0}",[guild_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
 	,getDMChannels: function(cb) {
 		var _gthis = this;
 		var endpoint = new haxicord_endpoints_EndpointPath("/users/@me/channels",[]);
@@ -3637,49 +3023,6 @@ haxicord_endpoints_Endpoints.prototype = {
 				cb(res,null);
 			}
 		});
-	}
-	,createWebhook: function(channel_id,data,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/webhooks",[channel_id]);
-		this.callEndpoint("POST",endpoint,cb,data);
-	}
-	,getChannelWebhooks: function(channel_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/channels/{0}/webhooks",[channel_id]);
-		this.callEndpoint("GET",endpoint,cb);
-	}
-	,getGuildWebhooks: function(guild_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/guilds/{0}/webhooks",[guild_id]);
-		this.callEndpoint("GET",endpoint,cb);
-	}
-	,getWebhook: function(webhook_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/webhooks/{0}",[webhook_id]);
-		this.callEndpoint("GET",endpoint,cb);
-	}
-	,editWebhook: function(webhook_id,data,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/webhooks/{0}",[webhook_id]);
-		this.callEndpoint("PATCH",endpoint,cb,data);
-	}
-	,deleteWebhook: function(webhook_id,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/webhooks/{0}",[webhook_id]);
-		this.callEndpoint("DELETE",endpoint,cb);
-	}
-	,getWebhookWithToken: function(webhook_id,webhook_token,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/webhooks/{0}/{1}",[webhook_id,webhook_token]);
-		this.callEndpoint("GET",endpoint,cb,{ },false);
-	}
-	,editWebhookWithToken: function(webhook_id,webhook_token,data,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/webhooks/{0}/{1}",[webhook_id,webhook_token]);
-		this.callEndpoint("PATCH",endpoint,cb,data,false);
-	}
-	,deleteWebhookWithToken: function(webhook_id,webhook_token,cb) {
-		var endpoint = new haxicord_endpoints_EndpointPath("/webhooks/{0}/{1}",[webhook_id,webhook_token]);
-		this.callEndpoint("DELETE",endpoint,cb,{ },false);
-	}
-	,executeWebhook: function(webhook_id,webhook_token,data,wait,cb) {
-		if(wait == null) {
-			wait = false;
-		}
-		var endpoint = new haxicord_endpoints_EndpointPath("/webhooks/{0}/{1}?wait={2}",[webhook_id,webhook_token,wait ? "true" : "false"]);
-		this.callEndpoint("POST",endpoint,cb,data,false);
 	}
 	,unQueueGlobally: function() {
 		this.globalLocked = false;
@@ -3905,10 +3248,16 @@ haxicord_endpoints_Endpoints.prototype = {
 		}
 		try {
 			haxicord_utils_Https.makeRequest(url,method,latency_cb,data,headers,false);
+			var thing = new haxe_http_HttpNodeJs(url);
+			var o = new haxe_ds__$StringMap_StringMapIterator(headers,headers.arrayKeys());
+			while(o.hasNext()) {
+				var o1 = o.next();
+				thing.setHeader(o1,__map_reserved[o1] != null ? headers.getReserved(o1) : headers.h[o1]);
+			}
 		} catch( e ) {
 			haxe_CallStack.lastException = e;
-			haxe_Log.trace(((e) instanceof js__$Boot_HaxeError) ? e.val : e,{ fileName : "Haxicord/src/haxicord/endpoints/Endpoints.hx", lineNumber : 1390, className : "haxicord.endpoints.Endpoints", methodName : "rawCallEndpoint"});
-			haxe_Log.trace(haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Haxicord/src/haxicord/endpoints/Endpoints.hx", lineNumber : 1391, className : "haxicord.endpoints.Endpoints", methodName : "rawCallEndpoint"});
+			haxe_Log.trace(((e) instanceof js__$Boot_HaxeError) ? e.val : e,{ fileName : "Haxicord/src/haxicord/endpoints/Endpoints.hx", lineNumber : 1394, className : "haxicord.endpoints.Endpoints", methodName : "rawCallEndpoint"});
+			haxe_Log.trace(haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Haxicord/src/haxicord/endpoints/Endpoints.hx", lineNumber : 1395, className : "haxicord.endpoints.Endpoints", methodName : "rawCallEndpoint"});
 		}
 	}
 	,__class__: haxicord_endpoints_Endpoints
@@ -3921,10 +3270,7 @@ var haxicord_endpoints_RateLimit = function(_l,_rm,_rs) {
 $hxClasses["haxicord.endpoints.RateLimit"] = haxicord_endpoints_RateLimit;
 haxicord_endpoints_RateLimit.__name__ = true;
 haxicord_endpoints_RateLimit.prototype = {
-	toString: function() {
-		return "RateLimit(" + this.remaining + "/" + this.limit + " until " + this.reset + ")";
-	}
-	,__class__: haxicord_endpoints_RateLimit
+	__class__: haxicord_endpoints_RateLimit
 };
 var haxicord_endpoints_EndpointCall = function(_m,_e,_c,_d,_a) {
 	if(_a == null) {
@@ -3979,9 +3325,6 @@ haxicord_logger_Logger.registerLogger = function() {
 	haxicord_logger_Logger.origTrace = haxe_Log.trace;
 	haxe_Log.trace = haxicord_logger_Logger.hxTrace;
 };
-haxicord_logger_Logger.unregisterLogger = function() {
-	haxe_Log.trace = haxicord_logger_Logger.origTrace;
-};
 haxicord_logger_Logger.getReplaceColor = function(col) {
 	return "";
 };
@@ -4018,9 +3361,6 @@ haxicord_logger_Logger.hxTrace = function(v,infos) {
 	}
 	haxicord_logger_Logger.origTrace(infostr + Std.string(v),null);
 };
-haxicord_logger_Logger.out = function(s) {
-	window.console.info(s);
-};
 haxicord_logger_Logger.err = function(s) {
 	window.console.error(s);
 };
@@ -4035,16 +3375,7 @@ haxicord_types_Channel.fromStruct = function(_chan) {
 	}
 };
 haxicord_types_Channel.prototype = {
-	getTag: function() {
-		return "<#" + this.id.id + ">";
-	}
-	,getPermission: function(uid) {
-		return 0;
-	}
-	,hasPermission: function(uid,p) {
-		return false;
-	}
-	,__class__: haxicord_types_Channel
+	__class__: haxicord_types_Channel
 };
 var haxicord_types_GuildChannel = function() { };
 $hxClasses["haxicord.types.GuildChannel"] = haxicord_types_GuildChannel;
@@ -4071,46 +3402,6 @@ haxicord_types_GuildChannel.__super__ = haxicord_types_Channel;
 haxicord_types_GuildChannel.prototype = $extend(haxicord_types_Channel.prototype,{
 	getGuild: function() {
 		return this.client.getGuildUnsafe(this.guild_id.id);
-	}
-	,getInvites: function(cb) {
-		this.client.endpoints.getChannelInvites(this.id.id,cb);
-	}
-	,createInvite: function(invite_data,cb) {
-		this.client.endpoints.createChannelInvite(this.id.id,invite_data,cb);
-	}
-	,editChannel: function(cd,cb) {
-		this.client.endpoints.modifyChannel(this.id.id,cd,cb);
-	}
-	,deleteChannel: function(cb) {
-		this.client.endpoints.deleteChannel(this.id.id,cb);
-	}
-	,editPermission: function(perm,pid,cb) {
-		this.client.endpoints.editChannelPermissions(this.id.id,pid,perm,cb);
-	}
-	,deletePermission: function(pid,cb) {
-		this.client.endpoints.deleteChannelPermission(this.id.id,pid,cb);
-	}
-	,getPermission: function(uid) {
-		var u = this.getGuild().getMemberUnsafe(uid);
-		var p = u.getPermissions();
-		var _g = 0;
-		var _g1 = this.permission_overwrites;
-		while(_g < _g1.length) {
-			var x = _g1[_g];
-			++_g;
-			if(x.type == haxicord_types_structs_OverwriteType.Member && x.id != uid) {
-				continue;
-			}
-			if(x.type == haxicord_types_structs_OverwriteType.Role && u.roles.indexOf(x.id) == -1) {
-				continue;
-			}
-			p |= x.allow;
-			p &= -1 ^ x.deny;
-		}
-		return p;
-	}
-	,hasPermission: function(uid,dp) {
-		return (this.getPermission(uid) & dp) == dp;
 	}
 	,__class__: haxicord_types_GuildChannel
 });
@@ -4215,42 +3506,6 @@ haxicord_types_DMChannel.prototype = $extend(haxicord_types_Channel.prototype,{
 	}
 	,sendMessage: function(mesg,cb) {
 		this.client.endpoints.sendMessage(this.id.id,mesg,cb);
-	}
-	,addMember: function(user_id,access_token,nick,cb) {
-		this.client.endpoints.groupDMAddRecipient(this.id.id,user_id,access_token,nick,cb);
-	}
-	,kickMember: function(user_id,cb) {
-		this.client.endpoints.groupDMRemoveRecipient(this.id.id,user_id,cb);
-	}
-	,getMessages: function(format,cb) {
-		this.client.endpoints.getMessages(this.id.id,format,cb);
-	}
-	,getMessage: function(mid,cb) {
-		this.client.endpoints.getMessage(this.id.id,mid,cb);
-	}
-	,deleteMessage: function(mid,cb) {
-		this.client.endpoints.deleteMessage(this.id.id,mid,cb);
-	}
-	,deleteMessages: function(ids,cb) {
-		this.client.endpoints.deleteMessages(this.id.id,ids,cb);
-	}
-	,startTyping: function(cb) {
-		this.client.endpoints.startTyping(this.id.id,cb);
-	}
-	,getPins: function(cb) {
-		this.client.endpoints.getChannelPins(this.id.id,cb);
-	}
-	,pinMessage: function(mid,cb) {
-		this.client.endpoints.addChannelPin(this.id.id,mid,cb);
-	}
-	,unpinMessage: function(mid,cb) {
-		this.client.endpoints.deleteChannelPin(this.id.id,mid,cb);
-	}
-	,getPermission: function(uid) {
-		return haxicord_utils_DPERMS.ADD_REACTIONS | haxicord_utils_DPERMS.SEND_MESSAGES | haxicord_utils_DPERMS.READ_MESSAGE_HISTORY | haxicord_utils_DPERMS.VIEW_CHANNEL | haxicord_utils_DPERMS.EMBED_LINKS | haxicord_utils_DPERMS.USE_EXTERNAL_EMOJIS;
-	}
-	,hasPermission: function(uid,dp) {
-		return (this.getPermission(uid) & dp) == dp;
 	}
 	,__class__: haxicord_types_DMChannel
 });
@@ -4662,122 +3917,6 @@ haxicord_types_Guild.prototype = {
 			}
 		}
 	}
-	,getChannels: function(cb) {
-		this.client.endpoints.getChannels(this.id.id,cb);
-	}
-	,createChannel: function(cs,cb) {
-		var _gthis = this;
-		this.client.endpoints.createChannel(this.id.id,cs,function(c,e) {
-			if(e != null) {
-				cb(null,e);
-			} else {
-				var f = function(c1,cb1) {
-					cb1(c1,null);
-				};
-				var cb2 = cb;
-				var tmp = function(c2) {
-					f(c2,cb2);
-				};
-				_gthis.nextChancb.push(tmp);
-			}
-		});
-	}
-	,getChannel: function(cid,cb) {
-		this.client.getChannel(cid,cb);
-	}
-	,findChannels: function(name) {
-		var rs = [];
-		var cs = [];
-		var _this = this.textChannels;
-		var r = new haxe_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
-		while(r.hasNext()) {
-			var r1 = r.next();
-			if(r1.name == name) {
-				rs.push(js_Boot.__cast(r1 , haxicord_types_GuildChannel));
-			} else if(r1.name.indexOf(name) > -1) {
-				cs.push(js_Boot.__cast(r1 , haxicord_types_GuildChannel));
-			}
-		}
-		var _this1 = this.voiceChannels;
-		var r2 = new haxe_ds__$StringMap_StringMapIterator(_this1,_this1.arrayKeys());
-		while(r2.hasNext()) {
-			var r3 = r2.next();
-			if(r3.name == name) {
-				rs.push(js_Boot.__cast(r3 , haxicord_types_GuildChannel));
-			} else if(r3.name.indexOf(name) > -1) {
-				cs.push(js_Boot.__cast(r3 , haxicord_types_GuildChannel));
-			}
-		}
-		var _this2 = this.categoryChannels;
-		var r4 = new haxe_ds__$StringMap_StringMapIterator(_this2,_this2.arrayKeys());
-		while(r4.hasNext()) {
-			var r5 = r4.next();
-			if(r5.name == name) {
-				rs.push(js_Boot.__cast(r5 , haxicord_types_GuildChannel));
-			} else if(r5.name.indexOf(name) > -1) {
-				cs.push(js_Boot.__cast(r5 , haxicord_types_GuildChannel));
-			}
-		}
-		var _this3 = this.storeChannels;
-		var r6 = new haxe_ds__$StringMap_StringMapIterator(_this3,_this3.arrayKeys());
-		while(r6.hasNext()) {
-			var r7 = r6.next();
-			if(r7.name == name) {
-				rs.push(js_Boot.__cast(r7 , haxicord_types_GuildChannel));
-			} else if(r7.name.indexOf(name) > -1) {
-				cs.push(js_Boot.__cast(r7 , haxicord_types_GuildChannel));
-			}
-		}
-		var _g = 0;
-		while(_g < cs.length) {
-			var r8 = cs[_g];
-			++_g;
-			rs.push(r8);
-		}
-		return rs;
-	}
-	,moveChannels: function() {
-	}
-	,getInvites: function(cb) {
-		this.client.endpoints.getInvites(this.id.id,cb);
-	}
-	,getRoles: function(cb) {
-		this.client.endpoints.getGuildRoles(this.id.id,cb);
-	}
-	,getRole: function(rid) {
-		var _this = this.roles;
-		if(__map_reserved[rid] != null) {
-			return _this.getReserved(rid);
-		} else {
-			return _this.h[rid];
-		}
-	}
-	,findRoles: function(name) {
-		var rs = [];
-		var cs = [];
-		var _this = this.roles;
-		var r = new haxe_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
-		while(r.hasNext()) {
-			var r1 = r.next();
-			if(r1.name == name) {
-				rs.push(r1);
-			} else if(r1.name.indexOf(name) > -1) {
-				cs.push(r1);
-			}
-		}
-		var _g = 0;
-		while(_g < cs.length) {
-			var r2 = cs[_g];
-			++_g;
-			rs.push(r2);
-		}
-		return rs;
-	}
-	,createRole: function(rs,cb) {
-		this.client.endpoints.createRole(this.id.id,rs,cb);
-	}
-	,moveRole: function(rs,cb) {
-	}
 	,getMember: function(mid,cb) {
 		var _this = this.members;
 		if(__map_reserved[mid] != null ? _this.existsReserved(mid) : _this.h.hasOwnProperty(mid)) {
@@ -4806,82 +3945,6 @@ haxicord_types_Guild.prototype = {
 			return null;
 		}
 	}
-	,getAllMembers: function(cb) {
-		haxe_Log.trace("Call to unfinished function getAllMembers. Please don't do this",{ fileName : "Haxicord/src/haxicord/types/Guild.hx", lineNumber : 595, className : "haxicord.types.Guild", methodName : "getAllMembers"});
-	}
-	,getMembers: function(format,cb) {
-		this.client.endpoints.getGuildMembers(this.id.id,format,cb);
-	}
-	,addMember: function(uid,mdata,cb) {
-		this.client.endpoints.addGuildMember(this.id.id,uid,mdata,cb);
-	}
-	,changeNickname: function(s,m,cb) {
-		if(m == null || m.user.id.id == this.client.user.id.id) {
-			this.client.endpoints.changeNickname(this.id.id,s,cb);
-		} else {
-			this.client.endpoints.editGuildMember(this.id.id,m.user.id.id,{ nick : s},cb);
-		}
-	}
-	,getBans: function(cb) {
-		this.client.endpoints.getGuildBans(this.id.id,cb);
-	}
-	,getPruneCount: function(days,cb) {
-		this.client.endpoints.getPruneCount(this.id.id,days,cb);
-	}
-	,getAuditLog: function(filter,cb) {
-		this.client.endpoints.getAuditLogs(this.id.id,filter,cb);
-	}
-	,beginPrune: function(days,cb) {
-		this.client.endpoints.beginPrune(this.id.id,days,cb);
-	}
-	,getVoiceRegions: function(cb) {
-		this.client.endpoints.guildVoiceRegions(this.id.id,cb);
-	}
-	,getIntegrations: function(cb) {
-		this.client.endpoints.getIntegrations(this.id.id,cb);
-	}
-	,addIntegration: function(intd,cb) {
-		this.client.endpoints.addIntegration(this.id.id,intd,cb);
-	}
-	,editIntegration: function(intid,intd,cb) {
-		this.client.endpoints.editIntegration(this.id.id,intid,intd,cb);
-	}
-	,syncIntegration: function(intid,cb) {
-		this.client.endpoints.syncIntegration(this.id.id,intid,cb);
-	}
-	,deleteIntegration: function(intid,cb) {
-		this.client.endpoints.deleteIntegration(this.id.id,intid,cb);
-	}
-	,getWidget: function(cb) {
-		this.client.endpoints.getWidget(this.id.id,cb);
-	}
-	,editWidget: function(wd,cb) {
-		this.client.endpoints.modifyWidget(this.id.id,wd,cb);
-	}
-	,edit: function(gd,cb) {
-		this.client.endpoints.modifyGuild(this.id.id,gd,cb);
-	}
-	,'delete': function(cb) {
-		this.client.endpoints.deleteGuild(this.id.id,cb);
-	}
-	,leave: function(cb) {
-		this.client.endpoints.leaveGuild(this.id.id,cb);
-	}
-	,listEmojis: function(cb) {
-		this.client.endpoints.listEmojis(this.id.id,cb);
-	}
-	,getEmoji: function(emoji_id,cb) {
-		this.client.endpoints.getEmoji(this.id.id,emoji_id,cb);
-	}
-	,createEmoji: function(emoji,cb) {
-		this.client.endpoints.createEmoji(this.id.id,emoji,cb);
-	}
-	,modifyEmoji: function(emoji_id,emoji,cb) {
-		this.client.endpoints.modifyEmoji(this.id.id,emoji_id,emoji,cb);
-	}
-	,removeEmoji: function(emoji_id,cb) {
-		this.client.endpoints.removeEmoji(this.id.id,emoji_id,cb);
-	}
 	,__class__: haxicord_types_Guild
 };
 var haxicord_types_GuildMember = function(_mem,_guild,_client) {
@@ -4898,13 +3961,7 @@ var haxicord_types_GuildMember = function(_mem,_guild,_client) {
 $hxClasses["haxicord.types.GuildMember"] = haxicord_types_GuildMember;
 haxicord_types_GuildMember.__name__ = true;
 haxicord_types_GuildMember.prototype = {
-	get_joined_at: function() {
-		if(this.joined_at_cache == null) {
-			this.joined_at_cache = haxe_DateUtils.fromISO8601(this.joined_at_iso);
-		}
-		return this.joined_at_cache;
-	}
-	,_update: function(_mem) {
+	_update: function(_mem) {
 		if(_mem.user != null) {
 			this.user = this.client._newUser(_mem.user);
 		}
@@ -4927,44 +3984,11 @@ haxicord_types_GuildMember.prototype = {
 		_pre.roles = null;
 		this.user.presence = _pre;
 	}
-	,addRole: function(rid,cb) {
-		this.client.endpoints.giveMemberRole(this.guild.id.id,this.user.id.id,rid,cb);
-	}
-	,removeRole: function(rid,cb) {
-		this.client.endpoints.takeMemberRole(this.guild.id.id,this.user.id.id,rid,cb);
-	}
-	,hasRole: function(rid) {
-		var _g = 0;
-		var _g1 = this.roles;
-		while(_g < _g1.length) {
-			var r = _g1[_g];
-			++_g;
-			if(r == rid) {
-				return true;
-			}
-		}
-		return false;
-	}
-	,edit: function(data,cb) {
-		this.client.endpoints.editGuildMember(this.guild.id.id,this.user.id.id,data,cb);
-	}
-	,changeNickname: function(s,cb) {
-		this.guild.changeNickname(s,this,cb);
-	}
 	,kick: function(reason,cb) {
 		if(reason == null) {
 			reason = "";
 		}
 		this.client.endpoints.kickMember(this.guild.id.id,this.user.id.id,reason,cb);
-	}
-	,ban: function(days,reason,cb) {
-		if(reason == null) {
-			reason = "";
-		}
-		if(days == null) {
-			days = 0;
-		}
-		this.client.endpoints.banMember(this.guild.id.id,this.user.id.id,days,reason,cb);
 	}
 	,hasPermissions: function(p) {
 		return (this.getPermissions() & p) == p;
@@ -4981,14 +4005,7 @@ haxicord_types_GuildMember.prototype = {
 		}
 		return p;
 	}
-	,getPermissionList: function() {
-		return haxicord_utils_DPERMS.PermsAsList(this.getPermissions());
-	}
-	,getPermissionStrings: function() {
-		return haxicord_utils_DPERMS.PermsAsNamedList(this.getPermissions());
-	}
 	,__class__: haxicord_types_GuildMember
-	,__properties__: {get_joined_at:"get_joined_at"}
 };
 var haxicord_types_Message = function(_msg,_client) {
 	this.reactions = [];
@@ -5059,13 +4076,7 @@ var haxicord_types_Message = function(_msg,_client) {
 $hxClasses["haxicord.types.Message"] = haxicord_types_Message;
 haxicord_types_Message.__name__ = true;
 haxicord_types_Message.prototype = {
-	get_timestamp: function() {
-		return haxe_DateUtils.fromISO8601(this.timestamp_str);
-	}
-	,get_edited_timestamp: function() {
-		return haxe_DateUtils.fromISO8601(this.edited_timestamp_str);
-	}
-	,_update: function(_msg) {
+	_update: function(_msg) {
 		if(_msg.edited_timestamp != null) {
 			this.edited_timestamp_str = _msg.edited_timestamp;
 		}
@@ -5148,12 +4159,6 @@ haxicord_types_Message.prototype = {
 	,_purgeReactions: function() {
 		this.reactions = [];
 	}
-	,pin: function(cb) {
-		(js_Boot.__cast(this.client.getChannelUnsafe(this.channel_id.id) , haxicord_types_MessageChannel)).pinMessage(this.id.id,cb);
-	}
-	,unpin: function(cb) {
-		(js_Boot.__cast(this.client.getChannelUnsafe(this.channel_id.id) , haxicord_types_MessageChannel)).unpinMessage(this.id.id,cb);
-	}
 	,getChannel: function() {
 		return js_Boot.__cast(this.client.getChannelUnsafe(this.channel_id.id) , haxicord_types_MessageChannel);
 	}
@@ -5177,55 +4182,7 @@ haxicord_types_Message.prototype = {
 	,reply: function(msg,cb) {
 		this.client.endpoints.sendMessage(this.channel_id.id,msg,cb);
 	}
-	,edit: function(msg,cb) {
-		this.client.endpoints.editMessage(this.channel_id.id,this.id.id,msg,cb);
-	}
-	,'delete': function(cb) {
-		this.client.endpoints.deleteMessage(this.channel_id.id,this.id.id,cb);
-	}
-	,getReactions: function(e,cb) {
-		this.client.endpoints.getReactions(this.channel_id.id,this.id.id,e,cb);
-	}
-	,react: function(e,cb) {
-		this.client.endpoints.createReaction(this.channel_id.id,this.id.id,e,cb);
-	}
-	,unreact: function(e,cb) {
-		this.client.endpoints.deleteOwnReaction(this.channel_id.id,this.id.id,e,cb);
-	}
-	,removeReaction: function(e,uid,cb) {
-		this.client.endpoints.deleteUserReaction(this.channel_id.id,this.id.id,uid,e,cb);
-	}
-	,removeAllReactions: function(cb) {
-		this.client.endpoints.deleteAllReactions(this.channel_id.id,this.id.id,cb);
-	}
-	,getPermission: function(channel_overrides) {
-		if(channel_overrides == null) {
-			channel_overrides = false;
-		}
-		if(channel_overrides || !this.inGuild()) {
-			return this.getChannel().getPermission(this.author.id.id);
-		} else {
-			return this.getMember().getPermissions();
-		}
-	}
-	,hasPermission: function(p,channel_overrides) {
-		if(channel_overrides == null) {
-			channel_overrides = false;
-		}
-		if(channel_overrides || !this.inGuild()) {
-			if(!this.getChannel().hasPermission(this.author.id.id,p)) {
-				return this.getMember().hasPermissions(haxicord_utils_DPERMS.ADMINISTRATOR);
-			} else {
-				return true;
-			}
-		} else if(!(this.getMember().hasPermissions(p) || this.getMember().hasPermissions(haxicord_utils_DPERMS.ADMINISTRATOR))) {
-			return this.getGuild().owner_id == this.author.id;
-		} else {
-			return true;
-		}
-	}
 	,__class__: haxicord_types_Message
-	,__properties__: {get_edited_timestamp:"get_edited_timestamp",get_timestamp:"get_timestamp"}
 };
 var haxicord_types_TextChannel = function(_chan,_client) {
 	this.client = _client;
@@ -5280,33 +4237,6 @@ haxicord_types_TextChannel.prototype = $extend(haxicord_types_GuildChannel.proto
 	,inGuild: function() {
 		return true;
 	}
-	,sendMessage: function(mesg,cb) {
-		this.client.endpoints.sendMessage(this.id.id,mesg,cb);
-	}
-	,getMessages: function(format,cb) {
-		this.client.endpoints.getMessages(this.id.id,format,cb);
-	}
-	,getMessage: function(mid,cb) {
-		this.client.endpoints.getMessage(this.id.id,mid,cb);
-	}
-	,deleteMessage: function(mid,cb) {
-		this.client.endpoints.deleteMessage(this.id.id,mid,cb);
-	}
-	,deleteMessages: function(ids,cb) {
-		this.client.endpoints.deleteMessages(this.id.id,ids,cb);
-	}
-	,startTyping: function(cb) {
-		this.client.endpoints.startTyping(this.id.id,cb);
-	}
-	,getPins: function(cb) {
-		this.client.endpoints.getChannelPins(this.id.id,cb);
-	}
-	,pinMessage: function(mid,cb) {
-		this.client.endpoints.addChannelPin(this.id.id,mid,cb);
-	}
-	,unpinMessage: function(mid,cb) {
-		this.client.endpoints.deleteChannelPin(this.id.id,mid,cb);
-	}
 	,__class__: haxicord_types_TextChannel
 });
 var haxicord_types_NewsChannel = function(_chan,_client) {
@@ -5356,18 +4286,6 @@ haxicord_types_Role.prototype = {
 			this.mentionable = _role.mentionable;
 		}
 	}
-	,edit: function(rd,cb) {
-		this.client.endpoints.editRole(this.guild.id.id,this.id.id,rd,cb);
-	}
-	,'delete': function(cb) {
-		this.client.endpoints.deleteRole(this.guild.id.id,this.id.id,cb);
-	}
-	,getPermissionList: function() {
-		return haxicord_utils_DPERMS.PermsAsList(this.permissions);
-	}
-	,getPermissionStrings: function() {
-		return haxicord_utils_DPERMS.PermsAsNamedList(this.permissions);
-	}
 	,__class__: haxicord_types_Role
 };
 var haxicord_types_Snowflake = function(flake) {
@@ -5382,24 +4300,8 @@ var haxicord_types_Snowflake = function(flake) {
 };
 $hxClasses["haxicord.types.Snowflake"] = haxicord_types_Snowflake;
 haxicord_types_Snowflake.__name__ = true;
-haxicord_types_Snowflake.generate = function() {
-	var flake = new haxicord_types_Snowflake();
-	flake.timestamp = new Date().getTime() / 1000;
-	var now = flake.timestamp - 1420070400000;
-	flake.id = "" + now * 4194304;
-	return flake;
-};
-haxicord_types_Snowflake.eq = function(a,b) {
-	return a.id == b.id;
-};
 haxicord_types_Snowflake.prototype = {
-	toString: function() {
-		return this.id;
-	}
-	,equals: function(b) {
-		return this.id == b.id;
-	}
-	,__class__: haxicord_types_Snowflake
+	__class__: haxicord_types_Snowflake
 };
 var haxicord_types_StoreChannel = function(_chan,_client) {
 	this.client = _client;
@@ -5419,24 +4321,7 @@ haxicord_types_StoreChannel.fromStruct = function(_chan,_client) {
 };
 haxicord_types_StoreChannel.__super__ = haxicord_types_GuildChannel;
 haxicord_types_StoreChannel.prototype = $extend(haxicord_types_GuildChannel.prototype,{
-	_update: function(_chan) {
-		if(_chan.name != null) {
-			this.name = _chan.name;
-		}
-		if(_chan.position != null) {
-			this.position = _chan.position;
-		}
-		if(_chan.permission_overwrites != null) {
-			this.permission_overwrites = _chan.permission_overwrites;
-		}
-		if(_chan.nsfw != null) {
-			this.nsfw = _chan.nsfw;
-		}
-	}
-	,inGuild: function() {
-		return true;
-	}
-	,__class__: haxicord_types_StoreChannel
+	__class__: haxicord_types_StoreChannel
 });
 var haxicord_types_User = function(_user,_client) {
 	this.client = _client;
@@ -5503,13 +4388,6 @@ haxicord_types_User.prototype = {
 			this.premium_type = _user.premium_type;
 		}
 	}
-	,load: function() {
-		if(this.isLoaded) {
-			return;
-		}
-		this.client.getUser(this.id.id,function(_) {
-		});
-	}
 	,__class__: haxicord_types_User
 };
 var haxicord_types_VoiceChannel = function(_chan,_client) {
@@ -5554,94 +4432,14 @@ haxicord_types_VoiceChannel.prototype = $extend(haxicord_types_GuildChannel.prot
 	}
 	,__class__: haxicord_types_VoiceChannel
 });
-var haxicord_types_structs_OverwriteType = $hxEnums["haxicord.types.structs.OverwriteType"] = { __ename__ : true, __constructs__ : ["Role","Member"]
-	,Role: {_hx_index:0,__enum__:"haxicord.types.structs.OverwriteType",toString:$estr}
-	,Member: {_hx_index:1,__enum__:"haxicord.types.structs.OverwriteType",toString:$estr}
-};
 var haxicord_utils_DPERMS = function() { };
 $hxClasses["haxicord.utils.DPERMS"] = haxicord_utils_DPERMS;
 haxicord_utils_DPERMS.__name__ = true;
-haxicord_utils_DPERMS.PermsAsNamedList = function(p) {
-	var l = [];
-	var _g = 0;
-	var _g1 = haxicord_utils_DPERMS.pvals.length;
-	while(_g < _g1) {
-		var x = _g++;
-		if((p & js_Boot.__cast(haxicord_utils_DPERMS.pvals[x] , Int)) > 0) {
-			l.push(haxicord_utils_DPERMS.pnames[x]);
-		}
-	}
-	return l;
-};
-haxicord_utils_DPERMS.PermsAsList = function(p) {
-	var l = [];
-	var _g = 0;
-	var _g1 = haxicord_utils_DPERMS.pvals;
-	while(_g < _g1.length) {
-		var x = _g1[_g];
-		++_g;
-		if((p & js_Boot.__cast(x , Int)) > 0) {
-			l.push(x);
-		}
-	}
-	return l;
-};
-haxicord_utils_DPERMS.PermsToInt = function(p) {
-	var i = 0;
-	var _g = 0;
-	while(_g < p.length) {
-		var x = p[_g];
-		++_g;
-		i |= x;
-	}
-	return i;
-};
-haxicord_utils_DPERMS.PermsToString = function(p) {
-	var l = haxicord_utils_DPERMS.PermsAsNamedList(p);
-	return l.join(" | ");
-};
-haxicord_utils_DPERMS.PermArrToString = function(p) {
-	var result = new Array(p.length);
-	var _g = 0;
-	var _g1 = p.length;
-	while(_g < _g1) {
-		var i = _g++;
-		result[i] = haxicord_utils_DPERMS.permToString(p[i]);
-	}
-	return result.join(" | ");
-};
-haxicord_utils_DPERMS.permToString = function(d) {
-	return haxicord_utils_DPERMS.pnames[haxicord_utils_DPERMS.pvals.indexOf(d)];
-};
 var haxicord_utils_Https = function() { };
 $hxClasses["haxicord.utils.Https"] = haxicord_utils_Https;
 haxicord_utils_Https.__name__ = true;
 haxicord_utils_Https.stringify = function(d) {
 	return JSON.stringify(d);
-};
-haxicord_utils_Https.queryString = function(datar,startMark) {
-	if(startMark == null) {
-		startMark = true;
-	}
-	try {
-		var data = js_Boot.__cast(datar , haxe_ds_StringMap);
-		var s = startMark ? "?" : "";
-		var c = 0;
-		var k = data.keys();
-		while(k.hasNext()) {
-			var k1 = k.next();
-			var v = __map_reserved[k1] != null ? data.getReserved(k1) : data.h[k1];
-			if(c++ != 0) {
-				s += "&";
-			}
-			s += k1 + "=" + Std.string(v);
-		}
-		return s;
-	} catch( e ) {
-		haxe_CallStack.lastException = e;
-		var e1 = ((e) instanceof js__$Boot_HaxeError) ? e.val : e;
-		return "";
-	}
 };
 haxicord_utils_Https.makeRequest = function(url,method,_callback,_d,_headers,async,isJson) {
 	if(isJson == null) {
@@ -5697,8 +4495,8 @@ haxicord_utils_Https._makeRequest = function(url,method,_callback,_d,_headers,is
 			} catch( er ) {
 				haxe_CallStack.lastException = er;
 				var er1 = ((er) instanceof js__$Boot_HaxeError) ? er.val : er;
-				haxe_Log.trace("UNCAUGHT ERROR IN haxe.Https.makeRequest CALLBACK.",{ fileName : "Haxicord/src/haxicord/utils/Https.hx", lineNumber : 101, className : "haxicord.utils.Https", methodName : "_makeRequest"});
-				haxe_Log.trace(Std.string(er1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Haxicord/src/haxicord/utils/Https.hx", lineNumber : 102, className : "haxicord.utils.Https", methodName : "_makeRequest"});
+				haxe_Log.trace("UNCAUGHT ERROR IN haxe.Https.makeRequest CALLBACK.",{ fileName : "Haxicord/src/haxicord/utils/Https.hx", lineNumber : 102, className : "haxicord.utils.Https", methodName : "_makeRequest"});
+				haxe_Log.trace(Std.string(er1) + haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Haxicord/src/haxicord/utils/Https.hx", lineNumber : 103, className : "haxicord.utils.Https", methodName : "_makeRequest"});
 			}
 		};
 		if(_headers == null) {
@@ -5769,7 +4567,7 @@ haxicord_utils_Https._makeRequest = function(url,method,_callback,_d,_headers,is
 	} catch( er2 ) {
 		haxe_CallStack.lastException = er2;
 		var er3 = ((er2) instanceof js__$Boot_HaxeError) ? er2.val : er2;
-		haxe_Log.trace(haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Haxicord/src/haxicord/utils/Https.hx", lineNumber : 262, className : "haxicord.utils.Https", methodName : "_makeRequest"});
+		haxe_Log.trace(haxe_CallStack.toString(haxe_CallStack.exceptionStack()),{ fileName : "Haxicord/src/haxicord/utils/Https.hx", lineNumber : 263, className : "haxicord.utils.Https", methodName : "_makeRequest"});
 		_callback({ status : -1, error : Std.string(er3)},null);
 	}
 };
@@ -5916,24 +4714,6 @@ var hscript_Error = $hxEnums["hscript.Error"] = { __ename__ : true, __constructs
 	,EInvalidOp: ($_=function(op) { return {_hx_index:7,op:op,__enum__:"hscript.Error",toString:$estr}; },$_.__params__ = ["op"],$_)
 	,EInvalidAccess: ($_=function(f) { return {_hx_index:8,f:f,__enum__:"hscript.Error",toString:$estr}; },$_.__params__ = ["f"],$_)
 	,ECustom: ($_=function(msg) { return {_hx_index:9,msg:msg,__enum__:"hscript.Error",toString:$estr}; },$_.__params__ = ["msg"],$_)
-};
-var hscript_ModuleDecl = $hxEnums["hscript.ModuleDecl"] = { __ename__ : true, __constructs__ : ["DPackage","DImport","DClass","DTypedef"]
-	,DPackage: ($_=function(path) { return {_hx_index:0,path:path,__enum__:"hscript.ModuleDecl",toString:$estr}; },$_.__params__ = ["path"],$_)
-	,DImport: ($_=function(path,everything) { return {_hx_index:1,path:path,everything:everything,__enum__:"hscript.ModuleDecl",toString:$estr}; },$_.__params__ = ["path","everything"],$_)
-	,DClass: ($_=function(c) { return {_hx_index:2,c:c,__enum__:"hscript.ModuleDecl",toString:$estr}; },$_.__params__ = ["c"],$_)
-	,DTypedef: ($_=function(c) { return {_hx_index:3,c:c,__enum__:"hscript.ModuleDecl",toString:$estr}; },$_.__params__ = ["c"],$_)
-};
-var hscript_FieldAccess = $hxEnums["hscript.FieldAccess"] = { __ename__ : true, __constructs__ : ["APublic","APrivate","AInline","AOverride","AStatic","AMacro"]
-	,APublic: {_hx_index:0,__enum__:"hscript.FieldAccess",toString:$estr}
-	,APrivate: {_hx_index:1,__enum__:"hscript.FieldAccess",toString:$estr}
-	,AInline: {_hx_index:2,__enum__:"hscript.FieldAccess",toString:$estr}
-	,AOverride: {_hx_index:3,__enum__:"hscript.FieldAccess",toString:$estr}
-	,AStatic: {_hx_index:4,__enum__:"hscript.FieldAccess",toString:$estr}
-	,AMacro: {_hx_index:5,__enum__:"hscript.FieldAccess",toString:$estr}
-};
-var hscript_FieldKind = $hxEnums["hscript.FieldKind"] = { __ename__ : true, __constructs__ : ["KFunction","KVar"]
-	,KFunction: ($_=function(f) { return {_hx_index:0,f:f,__enum__:"hscript.FieldKind",toString:$estr}; },$_.__params__ = ["f"],$_)
-	,KVar: ($_=function(v) { return {_hx_index:1,v:v,__enum__:"hscript.FieldKind",toString:$estr}; },$_.__params__ = ["v"],$_)
 };
 var hscript__$Interp_Stop = $hxEnums["hscript._Interp.Stop"] = { __ename__ : true, __constructs__ : ["SBreak","SContinue","SReturn"]
 	,SBreak: {_hx_index:0,__enum__:"hscript._Interp.Stop",toString:$estr}
@@ -6452,19 +5232,6 @@ hscript_Interp.prototype = {
 				_this.h[key] = value;
 			}
 		}
-	}
-	,error: function(e,rethrow) {
-		if(rethrow == null) {
-			rethrow = false;
-		}
-		if(rethrow) {
-			throw js__$Boot_HaxeError.wrap(e);
-		} else {
-			throw new js__$Boot_HaxeError(e);
-		}
-	}
-	,rethrow: function(e) {
-		throw js__$Boot_HaxeError.wrap(e);
 	}
 	,resolve: function(id) {
 		var _this = this.locals;
@@ -7041,15 +5808,6 @@ hscript_Interp.prototype = {
 		}
 		this.restore(old);
 	}
-	,isMap: function(o) {
-		return js_Boot.__implements(o,haxe_IMap);
-	}
-	,getMapValue: function(map,key) {
-		return (js_Boot.__cast(map , haxe_IMap)).get(key);
-	}
-	,setMapValue: function(map,key,value) {
-		(js_Boot.__cast(map , haxe_IMap)).set(key,value);
-	}
 	,get: function(o,f) {
 		if(o == null) {
 			var e = hscript_Error.EInvalidAccess(f);
@@ -7178,12 +5936,7 @@ var hscript_Parser = function() {
 $hxClasses["hscript.Parser"] = hscript_Parser;
 hscript_Parser.__name__ = true;
 hscript_Parser.prototype = {
-	error: function(err,pmin,pmax) {
-		if(!this.resumeErrors) {
-			throw new js__$Boot_HaxeError(err);
-		}
-	}
-	,invalidChar: function(c) {
+	invalidChar: function(c) {
 		if(!this.resumeErrors) {
 			throw new js__$Boot_HaxeError(hscript_Error.EInvalidChar(c));
 		}
@@ -7238,22 +5991,6 @@ hscript_Parser.prototype = {
 		}
 		return null;
 	}
-	,push: function(tk) {
-		var _this = this.tokens;
-		_this.head = new haxe_ds_GenericCell(tk,_this.head);
-	}
-	,ensure: function(tk) {
-		var t = this.token();
-		if(t != tk) {
-			this.unexpected(t);
-		}
-	}
-	,ensureToken: function(tk) {
-		var t = this.token();
-		if(!Type.enumEq(t,tk)) {
-			this.unexpected(t);
-		}
-	}
 	,maybe: function(tk) {
 		var t = this.token();
 		if(Type.enumEq(t,tk)) {
@@ -7275,18 +6012,6 @@ hscript_Parser.prototype = {
 			this.unexpected(tk);
 			return null;
 		}
-	}
-	,expr: function(e) {
-		return e;
-	}
-	,pmin: function(e) {
-		return 0;
-	}
-	,pmax: function(e) {
-		return 0;
-	}
-	,mk: function(e,pmin,pmax) {
-		return e;
 	}
 	,isBlock: function(e) {
 		if(e == null) {
@@ -8660,256 +7385,6 @@ hscript_Parser.prototype = {
 		}
 		return args;
 	}
-	,parseModule: function(content,origin) {
-		if(origin == null) {
-			origin = "hscript";
-		}
-		this.initParser(origin);
-		this.input = content;
-		this.readPos = 0;
-		this.allowTypes = true;
-		this.allowMetadata = true;
-		var decls = [];
-		while(true) {
-			var tk = this.token();
-			if(tk == hscript_Token.TEof) {
-				break;
-			}
-			var _this = this.tokens;
-			_this.head = new haxe_ds_GenericCell(tk,_this.head);
-			decls.push(this.parseModuleDecl());
-		}
-		return decls;
-	}
-	,parseMetadata: function() {
-		var meta = [];
-		while(true) {
-			var tk = this.token();
-			if(tk == null) {
-				var _this = this.tokens;
-				_this.head = new haxe_ds_GenericCell(tk,_this.head);
-				break;
-			} else if(tk._hx_index == 15) {
-				var name = tk.s;
-				meta.push({ name : name, params : this.parseMetaArgs()});
-			} else {
-				var _this1 = this.tokens;
-				_this1.head = new haxe_ds_GenericCell(tk,_this1.head);
-				break;
-			}
-		}
-		return meta;
-	}
-	,parseParams: function() {
-		if(this.maybe(hscript_Token.TOp("<"))) {
-			if(!this.resumeErrors) {
-				throw new js__$Boot_HaxeError(hscript_Error.EInvalidOp("Unsupported class type parameters"));
-			}
-		}
-		return { };
-	}
-	,parseModuleDecl: function() {
-		var meta = this.parseMetadata();
-		var ident = this.getIdent();
-		var isPrivate = false;
-		var isExtern = false;
-		_hx_loop1: while(true) {
-			switch(ident) {
-			case "extern":
-				isExtern = true;
-				break;
-			case "private":
-				isPrivate = true;
-				break;
-			default:
-				break _hx_loop1;
-			}
-			ident = this.getIdent();
-		}
-		switch(ident) {
-		case "class":
-			var name = this.getIdent();
-			var params = this.parseParams();
-			var extend = null;
-			var implement = [];
-			_hx_loop2: while(true) {
-				var t = this.token();
-				if(t == null) {
-					var _this = this.tokens;
-					_this.head = new haxe_ds_GenericCell(t,_this.head);
-					break;
-				} else if(t._hx_index == 2) {
-					switch(t.s) {
-					case "extends":
-						extend = this.parseType();
-						break;
-					case "implements":
-						implement.push(this.parseType());
-						break;
-					default:
-						var _this1 = this.tokens;
-						_this1.head = new haxe_ds_GenericCell(t,_this1.head);
-						break _hx_loop2;
-					}
-				} else {
-					var _this2 = this.tokens;
-					_this2.head = new haxe_ds_GenericCell(t,_this2.head);
-					break;
-				}
-			}
-			var fields = [];
-			var t1 = this.token();
-			if(t1 != hscript_Token.TBrOpen) {
-				this.unexpected(t1);
-			}
-			while(!this.maybe(hscript_Token.TBrClose)) fields.push(this.parseField());
-			return hscript_ModuleDecl.DClass({ name : name, meta : meta, params : params, extend : extend, implement : implement, fields : fields, isPrivate : isPrivate, isExtern : isExtern});
-		case "import":
-			var path = [this.getIdent()];
-			var star = false;
-			while(true) {
-				var t2 = this.token();
-				if(t2 != hscript_Token.TDot) {
-					var _this3 = this.tokens;
-					_this3.head = new haxe_ds_GenericCell(t2,_this3.head);
-					break;
-				}
-				t2 = this.token();
-				if(t2 == null) {
-					this.unexpected(t2);
-				} else {
-					switch(t2._hx_index) {
-					case 2:
-						var id = t2.s;
-						path.push(id);
-						break;
-					case 3:
-						if(t2.s == "*") {
-							star = true;
-						} else {
-							this.unexpected(t2);
-						}
-						break;
-					default:
-						this.unexpected(t2);
-					}
-				}
-			}
-			var t3 = this.token();
-			if(t3 != hscript_Token.TSemicolon) {
-				this.unexpected(t3);
-			}
-			return hscript_ModuleDecl.DImport(path,star);
-		case "package":
-			var path1 = this.parsePath();
-			var t4 = this.token();
-			if(t4 != hscript_Token.TSemicolon) {
-				this.unexpected(t4);
-			}
-			return hscript_ModuleDecl.DPackage(path1);
-		case "typedef":
-			var name1 = this.getIdent();
-			var params1 = this.parseParams();
-			var t5 = this.token();
-			if(!Type.enumEq(t5,hscript_Token.TOp("="))) {
-				this.unexpected(t5);
-			}
-			var t6 = this.parseType();
-			return hscript_ModuleDecl.DTypedef({ name : name1, meta : meta, params : params1, isPrivate : isPrivate, t : t6});
-		default:
-			this.unexpected(hscript_Token.TId(ident));
-		}
-		return null;
-	}
-	,parseField: function() {
-		var meta = this.parseMetadata();
-		var access = [];
-		_hx_loop1: while(true) {
-			var id = this.getIdent();
-			switch(id) {
-			case "function":
-				var name = this.getIdent();
-				var inf = this.parseFunctionDecl();
-				return { name : name, meta : meta, access : access, kind : hscript_FieldKind.KFunction({ args : inf.args, expr : inf.body, ret : inf.ret})};
-			case "inline":
-				access.push(hscript_FieldAccess.AInline);
-				break;
-			case "macro":
-				access.push(hscript_FieldAccess.AMacro);
-				break;
-			case "override":
-				access.push(hscript_FieldAccess.AOverride);
-				break;
-			case "private":
-				access.push(hscript_FieldAccess.APrivate);
-				break;
-			case "public":
-				access.push(hscript_FieldAccess.APublic);
-				break;
-			case "static":
-				access.push(hscript_FieldAccess.AStatic);
-				break;
-			case "var":
-				var name1 = this.getIdent();
-				var get = null;
-				var set = null;
-				if(this.maybe(hscript_Token.TPOpen)) {
-					get = this.getIdent();
-					var t = this.token();
-					if(t != hscript_Token.TComma) {
-						this.unexpected(t);
-					}
-					set = this.getIdent();
-					var t1 = this.token();
-					if(t1 != hscript_Token.TPClose) {
-						this.unexpected(t1);
-					}
-				}
-				var type = this.maybe(hscript_Token.TDoubleDot) ? this.parseType() : null;
-				var expr = this.maybe(hscript_Token.TOp("=")) ? this.parseExpr() : null;
-				if(expr != null) {
-					if(this.isBlock(expr)) {
-						this.maybe(hscript_Token.TSemicolon);
-					} else {
-						var t2 = this.token();
-						if(t2 != hscript_Token.TSemicolon) {
-							this.unexpected(t2);
-						}
-					}
-				} else {
-					var tmp;
-					if(type != null) {
-						if(type == null) {
-							tmp = false;
-						} else if(type._hx_index == 2) {
-							var _g = type.fields;
-							tmp = true;
-						} else {
-							tmp = false;
-						}
-					} else {
-						tmp = false;
-					}
-					if(tmp) {
-						this.maybe(hscript_Token.TSemicolon);
-					} else {
-						var t3 = this.token();
-						if(t3 != hscript_Token.TSemicolon) {
-							this.unexpected(t3);
-						}
-					}
-				}
-				return { name : name1, meta : meta, access : access, kind : hscript_FieldKind.KVar({ get : get, set : set, type : type, expr : expr})};
-			default:
-				this.unexpected(hscript_Token.TId(id));
-				break _hx_loop1;
-			}
-		}
-		return null;
-	}
-	,readChar: function() {
-		return this.input.charCodeAt(this.readPos++);
-	}
 	,readString: function(until) {
 		var c = 0;
 		var b_b = "";
@@ -9525,417 +8000,6 @@ hscript_Parser.prototype = {
 	}
 	,__class__: hscript_Parser
 };
-var hscript_Tools = function() { };
-$hxClasses["hscript.Tools"] = hscript_Tools;
-hscript_Tools.__name__ = true;
-hscript_Tools.iter = function(e,f) {
-	switch(e._hx_index) {
-	case 0:
-		var _g19 = e.c;
-		break;
-	case 1:
-		var _g27 = e.v;
-		break;
-	case 2:
-		var _g32 = e.t;
-		var _g31 = e.n;
-		var e1 = e.e;
-		if(e1 != null) {
-			f(e1);
-		}
-		break;
-	case 3:
-		var e2 = e.e;
-		f(e2);
-		break;
-	case 4:
-		var el = e.e;
-		var _g = 0;
-		while(_g < el.length) {
-			var e3 = el[_g];
-			++_g;
-			f(e3);
-		}
-		break;
-	case 5:
-		var _g49 = e.f;
-		var e4 = e.e;
-		f(e4);
-		break;
-	case 6:
-		var _g36 = e.op;
-		var e21 = e.e2;
-		var e11 = e.e1;
-		f(e11);
-		f(e21);
-		break;
-	case 7:
-		var _g13 = e.prefix;
-		var _g12 = e.op;
-		var e5 = e.e;
-		f(e5);
-		break;
-	case 8:
-		var args = e.params;
-		var e6 = e.e;
-		f(e6);
-		var _g1 = 0;
-		while(_g1 < args.length) {
-			var a = args[_g1];
-			++_g1;
-			f(a);
-		}
-		break;
-	case 9:
-		var e22 = e.e2;
-		var e12 = e.e1;
-		var c = e.cond;
-		f(c);
-		f(e12);
-		if(e22 != null) {
-			f(e22);
-		}
-		break;
-	case 10:
-		var e7 = e.e;
-		var c1 = e.cond;
-		f(c1);
-		f(e7);
-		break;
-	case 11:
-		var _g28 = e.v;
-		var e8 = e.e;
-		var it = e.it;
-		f(it);
-		f(e8);
-		break;
-	case 12:case 13:
-		break;
-	case 14:
-		var _g44 = e.ret;
-		var _g43 = e.name;
-		var _g41 = e.args;
-		var e9 = e.e;
-		f(e9);
-		break;
-	case 15:
-		var e10 = e.e;
-		if(e10 != null) {
-			f(e10);
-		}
-		break;
-	case 16:
-		var i = e.index;
-		var e13 = e.e;
-		f(e13);
-		f(i);
-		break;
-	case 17:
-		var el1 = e.e;
-		var _g2 = 0;
-		while(_g2 < el1.length) {
-			var e14 = el1[_g2];
-			++_g2;
-			f(e14);
-		}
-		break;
-	case 18:
-		var _g17 = e.cl;
-		var el2 = e.params;
-		var _g3 = 0;
-		while(_g3 < el2.length) {
-			var e15 = el2[_g3];
-			++_g3;
-			f(e15);
-		}
-		break;
-	case 19:
-		var e16 = e.e;
-		f(e16);
-		break;
-	case 20:
-		var _g5 = e.t;
-		var _g4 = e.v;
-		var c2 = e.ecatch;
-		var e17 = e.e;
-		f(e17);
-		f(c2);
-		break;
-	case 21:
-		var fl = e.fl;
-		var _g6 = 0;
-		while(_g6 < fl.length) {
-			var fi = fl[_g6];
-			++_g6;
-			f(fi.e);
-		}
-		break;
-	case 22:
-		var e23 = e.e2;
-		var e18 = e.e1;
-		var c3 = e.cond;
-		f(c3);
-		f(e18);
-		f(e23);
-		break;
-	case 23:
-		var def = e.defaultExpr;
-		var cases = e.cases;
-		var e19 = e.e;
-		f(e19);
-		var _g7 = 0;
-		while(_g7 < cases.length) {
-			var c4 = cases[_g7];
-			++_g7;
-			var _g8 = 0;
-			var _g11 = c4.values;
-			while(_g8 < _g11.length) {
-				var v = _g11[_g8];
-				++_g8;
-				f(v);
-			}
-			f(c4.expr);
-		}
-		if(def != null) {
-			f(def);
-		}
-		break;
-	case 24:
-		var e20 = e.e;
-		var c5 = e.cond;
-		f(c5);
-		f(e20);
-		break;
-	case 25:
-		var e24 = e.e;
-		var args1 = e.args;
-		var name = e.name;
-		if(args1 != null) {
-			var _g9 = 0;
-			while(_g9 < args1.length) {
-				var a1 = args1[_g9];
-				++_g9;
-				f(a1);
-			}
-		}
-		f(e24);
-		break;
-	case 26:
-		var _g46 = e.t;
-		var e25 = e.e;
-		f(e25);
-		break;
-	}
-};
-hscript_Tools.map = function(e,f) {
-	var edef;
-	switch(e._hx_index) {
-	case 0:
-		var _g19 = e.c;
-		edef = e;
-		break;
-	case 1:
-		var _g27 = e.v;
-		edef = e;
-		break;
-	case 2:
-		var e1 = e.e;
-		var t = e.t;
-		var n = e.n;
-		edef = hscript_Expr.EVar(n,t,e1 != null ? f(e1) : null);
-		break;
-	case 3:
-		var e2 = e.e;
-		edef = hscript_Expr.EParent(f(e2));
-		break;
-	case 4:
-		var el = e.e;
-		var _g = [];
-		var _g1 = 0;
-		while(_g1 < el.length) {
-			var e3 = el[_g1];
-			++_g1;
-			_g.push(f(e3));
-		}
-		edef = hscript_Expr.EBlock(_g);
-		break;
-	case 5:
-		var fi = e.f;
-		var e4 = e.e;
-		edef = hscript_Expr.EField(f(e4),fi);
-		break;
-	case 6:
-		var e21 = e.e2;
-		var e11 = e.e1;
-		var op = e.op;
-		edef = hscript_Expr.EBinop(op,f(e11),f(e21));
-		break;
-	case 7:
-		var e5 = e.e;
-		var pre = e.prefix;
-		var op1 = e.op;
-		edef = hscript_Expr.EUnop(op1,pre,f(e5));
-		break;
-	case 8:
-		var args = e.params;
-		var e6 = e.e;
-		var edef1 = f(e6);
-		var _g2 = [];
-		var _g11 = 0;
-		while(_g11 < args.length) {
-			var a = args[_g11];
-			++_g11;
-			_g2.push(f(a));
-		}
-		edef = hscript_Expr.ECall(edef1,_g2);
-		break;
-	case 9:
-		var e22 = e.e2;
-		var e12 = e.e1;
-		var c = e.cond;
-		edef = hscript_Expr.EIf(f(c),f(e12),e22 != null ? f(e22) : null);
-		break;
-	case 10:
-		var e7 = e.e;
-		var c1 = e.cond;
-		edef = hscript_Expr.EWhile(f(c1),f(e7));
-		break;
-	case 11:
-		var e8 = e.e;
-		var it = e.it;
-		var v = e.v;
-		edef = hscript_Expr.EFor(v,f(it),f(e8));
-		break;
-	case 12:case 13:
-		edef = e;
-		break;
-	case 14:
-		var t1 = e.ret;
-		var name = e.name;
-		var e9 = e.e;
-		var args1 = e.args;
-		edef = hscript_Expr.EFunction(args1,f(e9),name,t1);
-		break;
-	case 15:
-		var e10 = e.e;
-		edef = hscript_Expr.EReturn(e10 != null ? f(e10) : null);
-		break;
-	case 16:
-		var i = e.index;
-		var e13 = e.e;
-		edef = hscript_Expr.EArray(f(e13),f(i));
-		break;
-	case 17:
-		var el1 = e.e;
-		var _g3 = [];
-		var _g12 = 0;
-		while(_g12 < el1.length) {
-			var e14 = el1[_g12];
-			++_g12;
-			_g3.push(f(e14));
-		}
-		edef = hscript_Expr.EArrayDecl(_g3);
-		break;
-	case 18:
-		var el2 = e.params;
-		var cl = e.cl;
-		var _g4 = [];
-		var _g13 = 0;
-		while(_g13 < el2.length) {
-			var e15 = el2[_g13];
-			++_g13;
-			_g4.push(f(e15));
-		}
-		edef = hscript_Expr.ENew(cl,_g4);
-		break;
-	case 19:
-		var e16 = e.e;
-		edef = hscript_Expr.EThrow(f(e16));
-		break;
-	case 20:
-		var c2 = e.ecatch;
-		var t2 = e.t;
-		var v1 = e.v;
-		var e17 = e.e;
-		edef = hscript_Expr.ETry(f(e17),v1,t2,f(c2));
-		break;
-	case 21:
-		var fl = e.fl;
-		var _g5 = [];
-		var _g14 = 0;
-		while(_g14 < fl.length) {
-			var fi1 = fl[_g14];
-			++_g14;
-			_g5.push({ name : fi1.name, e : f(fi1.e)});
-		}
-		edef = hscript_Expr.EObject(_g5);
-		break;
-	case 22:
-		var e23 = e.e2;
-		var e18 = e.e1;
-		var c3 = e.cond;
-		edef = hscript_Expr.ETernary(f(c3),f(e18),f(e23));
-		break;
-	case 23:
-		var def = e.defaultExpr;
-		var cases = e.cases;
-		var e19 = e.e;
-		var edef2 = f(e19);
-		var _g6 = [];
-		var _g15 = 0;
-		while(_g15 < cases.length) {
-			var c4 = cases[_g15];
-			++_g15;
-			var _g16 = [];
-			var _g21 = 0;
-			var _g31 = c4.values;
-			while(_g21 < _g31.length) {
-				var v2 = _g31[_g21];
-				++_g21;
-				_g16.push(f(v2));
-			}
-			_g6.push({ values : _g16, expr : f(c4.expr)});
-		}
-		edef = hscript_Expr.ESwitch(edef2,_g6,def == null ? null : f(def));
-		break;
-	case 24:
-		var e20 = e.e;
-		var c5 = e.cond;
-		edef = hscript_Expr.EDoWhile(f(c5),f(e20));
-		break;
-	case 25:
-		var e24 = e.e;
-		var args2 = e.args;
-		var name1 = e.name;
-		var edef3;
-		if(args2 == null) {
-			edef3 = null;
-		} else {
-			var _g7 = [];
-			var _g17 = 0;
-			while(_g17 < args2.length) {
-				var a1 = args2[_g17];
-				++_g17;
-				_g7.push(f(a1));
-			}
-			edef3 = _g7;
-		}
-		edef = hscript_Expr.EMeta(name1,edef3,f(e24));
-		break;
-	case 26:
-		var t3 = e.t;
-		var e25 = e.e;
-		edef = hscript_Expr.ECheckType(f(e25),t3);
-		break;
-	}
-	return edef;
-};
-hscript_Tools.expr = function(e) {
-	return e;
-};
-hscript_Tools.mk = function(e,p) {
-	return e;
-};
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
 	this.val = val;
@@ -10182,57 +8246,10 @@ js_lib__$ArrayBuffer_ArrayBufferCompat.sliceImpl = function(begin,end) {
 var js_node_Fs = require("fs");
 var js_node_Http = require("http");
 var js_node_Https = require("https");
-var js_node__$KeyValue_KeyValue_$Impl_$ = {};
-$hxClasses["js.node._KeyValue.KeyValue_Impl_"] = js_node__$KeyValue_KeyValue_$Impl_$;
-js_node__$KeyValue_KeyValue_$Impl_$.__name__ = true;
-js_node__$KeyValue_KeyValue_$Impl_$.__properties__ = {get_value:"get_value",get_key:"get_key"};
-js_node__$KeyValue_KeyValue_$Impl_$.get_key = function(this1) {
-	return this1[0];
-};
-js_node__$KeyValue_KeyValue_$Impl_$.get_value = function(this1) {
-	return this1[1];
-};
 var js_node_Url = require("url");
 var js_node_Zlib = require("zlib");
 var js_node_buffer_Buffer = require("buffer").Buffer;
-var js_node_buffer__$Buffer_Helper = function() { };
-$hxClasses["js.node.buffer._Buffer.Helper"] = js_node_buffer__$Buffer_Helper;
-js_node_buffer__$Buffer_Helper.__name__ = true;
-js_node_buffer__$Buffer_Helper.bytesOfBuffer = function(b) {
-	var o = Object.create(haxe_io_Bytes.prototype);
-	o.length = b.byteLength;
-	o.b = b;
-	b.bufferValue = b;
-	b.hxBytes = o;
-	b.bytes = b;
-	return o;
-};
-var js_node_stream__$Writable_WritableNewOptionsAdapter_$Impl_$ = {};
-$hxClasses["js.node.stream._Writable.WritableNewOptionsAdapter_Impl_"] = js_node_stream__$Writable_WritableNewOptionsAdapter_$Impl_$;
-js_node_stream__$Writable_WritableNewOptionsAdapter_$Impl_$.__name__ = true;
-js_node_stream__$Writable_WritableNewOptionsAdapter_$Impl_$.from = function(options) {
-	if(!Object.prototype.hasOwnProperty.call(options,"final")) {
-		Object.defineProperty(options,"final",{ get : function() {
-			return options.final_;
-		}});
-	}
-	return options;
-};
 var js_node_url_URL = require("url").URL;
-var js_node_url__$URLSearchParams_URLSearchParamsEntry_$Impl_$ = {};
-$hxClasses["js.node.url._URLSearchParams.URLSearchParamsEntry_Impl_"] = js_node_url__$URLSearchParams_URLSearchParamsEntry_$Impl_$;
-js_node_url__$URLSearchParams_URLSearchParamsEntry_$Impl_$.__name__ = true;
-js_node_url__$URLSearchParams_URLSearchParamsEntry_$Impl_$.__properties__ = {get_value:"get_value",get_name:"get_name"};
-js_node_url__$URLSearchParams_URLSearchParamsEntry_$Impl_$._new = function(name,value) {
-	var this1 = [name,value];
-	return this1;
-};
-js_node_url__$URLSearchParams_URLSearchParamsEntry_$Impl_$.get_name = function(this1) {
-	return this1[0];
-};
-js_node_url__$URLSearchParams_URLSearchParamsEntry_$Impl_$.get_value = function(this1) {
-	return this1[1];
-};
 var lib_EvalHandler = function() { };
 $hxClasses["lib.EvalHandler"] = lib_EvalHandler;
 lib_EvalHandler.__name__ = true;
@@ -10292,43 +8309,31 @@ lib_EvalHandler.evaluate = function(s) {
 var lib_JsonHandler = function() { };
 $hxClasses["lib.JsonHandler"] = lib_JsonHandler;
 lib_JsonHandler.__name__ = true;
-lib_JsonHandler.canRead = function(file) {
-	return sys_FileSystem.exists(file);
-};
 lib_JsonHandler.read = function(file) {
-	var content = null;
+	var content = "";
 	if(sys_FileSystem.exists(file)) {
 		try {
-			content = js_node_Fs.readFileSync(file,{ encoding : "utf8"});
+			var tmp = new sys_io_FileInput(js_node_Fs.openSync(file,"r"));
+			content = tmp.readAll().toString();
 		} catch( e ) {
 			haxe_CallStack.lastException = e;
-			haxe_Log.trace(((e) instanceof js__$Boot_HaxeError) ? e.val : e,{ fileName : "Source/lib/JsonHandler.hx", lineNumber : 21, className : "lib.JsonHandler", methodName : "read"});
+			haxe_Log.trace(((e) instanceof js__$Boot_HaxeError) ? e.val : e,{ fileName : "Source/lib/JsonHandler.hx", lineNumber : 23, className : "lib.JsonHandler", methodName : "read"});
 		}
 	}
-	return JSON.parse(content);
+	if(content != null || content != "") {
+		return JSON.parse(content);
+	} else {
+		return { };
+	}
 };
 lib_JsonHandler.write = function(file,s) {
-	if(!sys_FileSystem.exists(file)) {
-		return;
-	}
-	try {
-		var a = new sys_io_FileOutput(js_node_Fs.openSync(file,"w"));
-		a.writeString(JSON.stringify(s));
-		a.close();
-	} catch( e ) {
-		haxe_CallStack.lastException = e;
-		haxe_Log.trace(((e) instanceof js__$Boot_HaxeError) ? e.val : e,{ fileName : "Source/lib/JsonHandler.hx", lineNumber : 39, className : "lib.JsonHandler", methodName : "write"});
-	}
+	var a = new sys_io_FileOutput(js_node_Fs.openSync(file,"w"));
+	a.writeString(JSON.stringify(s));
+	a.close();
 };
 var lib_Modio = function() { };
 $hxClasses["lib.Modio"] = lib_Modio;
 lib_Modio.__name__ = true;
-lib_Modio.getMods = function(cb) {
-	lib_Modio.getModioData("games/34/mods",cb);
-};
-lib_Modio.getModioData = function(_path,cb) {
-	lib_Modio.makeRequest("https://api.mod.io/v1/" + _path + "?api_key=" + Bot.getModioKey(),cb);
-};
 lib_Modio.makeRequest = function(full_path,cb) {
 	var req = new haxe_http_HttpNodeJs(full_path);
 	req.setHeader("Content-Type","application-json");
@@ -10347,10 +8352,6 @@ lib_Modio.makeRequest = function(full_path,cb) {
 var lib_Settings = function() { };
 $hxClasses["lib.Settings"] = lib_Settings;
 lib_Settings.__name__ = true;
-lib_Settings.getUser = function(id) {
-};
-lib_Settings.getGuild = function(id) {
-};
 var lib_Logger = function() { };
 $hxClasses["lib.Logger"] = lib_Logger;
 lib_Logger.__name__ = true;
@@ -10358,21 +8359,12 @@ lib_Logger.save = function() {
 	lib_JsonHandler.write("logs.json",lib_Logger.logs);
 };
 lib_Logger.addLog = function(v,infos) {
-	if(lib_Logger.logs == null) {
-		lib_Logger.logs = lib_Logger.getLogData();
-	}
-	if(lib_Logger.logs.logs == null) {
-		lib_Logger.logs = lib_Logger.getLogData();
-	}
 	lib_Logger.logs.logs.push(haxe_Log.formatOutput(v,infos));
+	lib_Logger.save();
 };
 lib_Logger.getLogData = function() {
 	var tmp = lib_JsonHandler.read("logs.json");
-	if(tmp == null || tmp == "") {
-		return { logs : []};
-	} else {
-		return JSON.parse(tmp);
-	}
+	return tmp;
 };
 lib_Logger.formatLogs = function() {
 	var tmp = lib_Logger.logs.logs.join("\n");
@@ -10381,7 +8373,7 @@ lib_Logger.formatLogs = function() {
 	var tmp2 = length / max;
 	var tmp3 = Math.ceil(tmp2);
 	var r = [];
-	haxe_Log.trace(tmp,{ fileName : "Source/lib/Settings.hx", lineNumber : 42, className : "lib.Logger", methodName : "formatLogs"});
+	haxe_Log.trace(tmp,{ fileName : "Source/lib/Settings.hx", lineNumber : 35, className : "lib.Logger", methodName : "formatLogs"});
 	var _g = 0;
 	var _g1 = tmp3;
 	while(_g < _g1) {
@@ -10390,10 +8382,6 @@ lib_Logger.formatLogs = function() {
 	}
 	return r;
 };
-lib_Logger.clearLogs = function() {
-	lib_Logger.logs = { logs : []};
-	lib_JsonHandler.write("logs.json",lib_Logger.logs);
-};
 lib_Logger.setTrace = function() {
 	lib_Logger.oldTrace = haxe_Log.trace;
 	haxe_Log.trace = function(v,infos) {
@@ -10401,35 +8389,11 @@ lib_Logger.setTrace = function() {
 		lib_Logger.oldTrace("[" + HxOverrides.dateStr(new Date()) + "] " + v,infos);
 	};
 };
-lib_Logger.sendErrorToWebhook = function(err) {
-	var webhook = "https://discordapp.com/api/webhooks/705025393601675275/EdFYmO9qqhRce-nOZRbwBHFWl0x_WPYOJ9kKNTcxorJ69cFDi3SNBoNoWN3te3NT9MqV";
-	var data = { embeds : []};
-	data.embeds.push({ color : 65280, title : "New Error!", timestamp : new Date(), description : err, author : { name : "Artemis"}});
-	var req = new haxe_http_HttpNodeJs(webhook);
-	req.setHeader("Content-Type","application-json");
-	req.setPostData(JSON.stringify(data));
-	req.onStatus = function(int) {
-		haxe_Log.trace(int,{ fileName : "Source/lib/Settings.hx", lineNumber : 73, className : "lib.Logger", methodName : "sendErrorToWebhook"});
-	};
-	req.request(true);
-};
 var lib_UserService = function() { };
 $hxClasses["lib.UserService"] = lib_UserService;
 lib_UserService.__name__ = true;
-lib_UserService.getPerms = function(u,s) {
-	var perm = Reflect.field(haxicord_utils_DPERMS,s);
-	if(u.hasPermissions(perm)) {
-		return true;
-	} else {
-		return false;
-	}
-};
 lib_UserService.canKick = function(u) {
 	var tmp = u.hasPermissions(haxicord_utils_DPERMS.ADMINISTRATOR) || u.hasPermissions(haxicord_utils_DPERMS.KICK_MEMBERS);
-	return tmp;
-};
-lib_UserService.canBan = function(u) {
-	var tmp = u.hasPermissions(haxicord_utils_DPERMS.ADMINISTRATOR) || u.hasPermissions(haxicord_utils_DPERMS.BAN_MEMBERS);
 	return tmp;
 };
 var sys_FileSystem = function() { };
@@ -10494,28 +8458,6 @@ sys_io_FileInput.prototype = $extend(haxe_io_Input.prototype,{
 		this.pos += bytesRead;
 		return bytesRead;
 	}
-	,close: function() {
-		js_node_Fs.closeSync(this.fd);
-	}
-	,seek: function(p,pos) {
-		switch(pos._hx_index) {
-		case 0:
-			this.pos = p;
-			break;
-		case 1:
-			this.pos += p;
-			break;
-		case 2:
-			this.pos = js_node_Fs.fstatSync(this.fd).size + p;
-			break;
-		}
-	}
-	,tell: function() {
-		return this.pos;
-	}
-	,eof: function() {
-		return this.pos >= js_node_Fs.fstatSync(this.fd).size;
-	}
 	,__class__: sys_io_FileInput
 });
 var sys_io_FileOutput = function(fd) {
@@ -10542,29 +8484,8 @@ sys_io_FileOutput.prototype = $extend(haxe_io_Output.prototype,{
 	,close: function() {
 		js_node_Fs.closeSync(this.fd);
 	}
-	,seek: function(p,pos) {
-		switch(pos._hx_index) {
-		case 0:
-			this.pos = p;
-			break;
-		case 1:
-			this.pos += p;
-			break;
-		case 2:
-			this.pos = js_node_Fs.fstatSync(this.fd).size + p;
-			break;
-		}
-	}
-	,tell: function() {
-		return this.pos;
-	}
 	,__class__: sys_io_FileOutput
 });
-var sys_io_FileSeek = $hxEnums["sys.io.FileSeek"] = { __ename__ : true, __constructs__ : ["SeekBegin","SeekCur","SeekEnd"]
-	,SeekBegin: {_hx_index:0,__enum__:"sys.io.FileSeek",toString:$estr}
-	,SeekCur: {_hx_index:1,__enum__:"sys.io.FileSeek",toString:$estr}
-	,SeekEnd: {_hx_index:2,__enum__:"sys.io.FileSeek",toString:$estr}
-};
 function $getIterator(o) { if( o instanceof Array ) return HxOverrides.iter(o); else return o.iterator(); }
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $global.$haxeUID++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = m.bind(o); o.hx__closures__[m.__id__] = f; } return f; }
 $global.$haxeUID |= 0;
@@ -10591,7 +8512,6 @@ js_Boot.__toStr = ({ }).toString;
 if(ArrayBuffer.prototype.slice == null) {
 	ArrayBuffer.prototype.slice = js_lib__$ArrayBuffer_ArrayBufferCompat.sliceImpl;
 }
-Bot.VERSION = "0.0.1";
 Bot.prefix = "]";
 CommandHandler.has_init = false;
 CommandHandler.commands = new haxe_ds_StringMap();
@@ -10606,42 +8526,9 @@ haxicord_DiscordClient.userAgent = "DiscordBot (https://github.com/RaidAndFade/H
 haxicord_DiscordClient.gatewayVersion = 6;
 haxicord_endpoints_Endpoints.BASEURL = "https://discordapp.com/api/";
 haxicord_logger_Logger.outPrefix = "[%c{Green}%t%c{Reset}] %c{lightblue}%cn%c{Reset}->%c{LightBlue}%fn()%c{Reset}:%c{LightRed}%l%c{Reset}: ";
-haxicord_utils_DPERMS.CREATE_INSTANT_INVITE = 1;
 haxicord_utils_DPERMS.KICK_MEMBERS = 2;
-haxicord_utils_DPERMS.BAN_MEMBERS = 4;
 haxicord_utils_DPERMS.ADMINISTRATOR = 8;
-haxicord_utils_DPERMS.MANAGE_CHANNELS = 16;
-haxicord_utils_DPERMS.MANAGE_GUILD = 32;
-haxicord_utils_DPERMS.ADD_REACTIONS = 64;
-haxicord_utils_DPERMS.VIEW_AUDIT_LOG = 128;
-haxicord_utils_DPERMS.VIEW_CHANNEL = 1024;
-haxicord_utils_DPERMS.SEND_MESSAGES = 2048;
-haxicord_utils_DPERMS.SEND_TTS_MESSAGES = 4096;
-haxicord_utils_DPERMS.MANAGE_MESSAGES = 8192;
-haxicord_utils_DPERMS.EMBED_LINKS = 16384;
-haxicord_utils_DPERMS.ATTACH_FILES = 32768;
-haxicord_utils_DPERMS.READ_MESSAGE_HISTORY = 65536;
-haxicord_utils_DPERMS.MENTION_EVERYONE = 131072;
-haxicord_utils_DPERMS.USE_EXTERNAL_EMOJIS = 262144;
-haxicord_utils_DPERMS.CONNECT = 1048576;
-haxicord_utils_DPERMS.SPEAK = 2097152;
-haxicord_utils_DPERMS.MUTE_MEMBERS = 4194304;
-haxicord_utils_DPERMS.DEAFEN_MEMBERS = 8388608;
-haxicord_utils_DPERMS.MOVE_MEMBERS = 16777216;
-haxicord_utils_DPERMS.USE_VAD = 33554432;
-haxicord_utils_DPERMS.PRIORITY_SPEAKER = 256;
-haxicord_utils_DPERMS.CHANGE_NICKNAME = 67108864;
-haxicord_utils_DPERMS.MANAGE_NICKNAMES = 134217728;
-haxicord_utils_DPERMS.MANAGE_ROLES = 268435456;
-haxicord_utils_DPERMS.MANAGE_WEBHOOKS = 536870912;
-haxicord_utils_DPERMS.MANAGE_EMOJIS = 1073741824;
-haxicord_utils_DPERMS.pnames = ["CREATE_INSTANT_INVITE","KICK_MEMBERS","BAN_MEMBERS","ADMINISTRATOR","MANAGE_CHANNELS","MANAGE_GUILD","ADD_REACTIONS","VIEW_AUDIT_LOG","VIEW_CHANNEL","SEND_MESSAGES","SEND_TTS_MESSAGES","MANAGE_MESSAGES","EMBED_LINKS","ATTACH_FILES","READ_MESSAGE_HISTORY","MENTION_EVERYONE","USE_EXTERNAL_EMOJIS","CONNECT","SPEAK","MUTE_MEMBERS","DEAFEN_MEMBERS","MOVE_MEMBERS","USE_VAD","PRIORITY_SPEAKER","CHANGE_NICKNAME","MANAGE_NICKNAMES","MANAGE_ROLES","MANAGE_WEBHOOKS","MANAGE_EMOJIS"];
-haxicord_utils_DPERMS.pvals = [haxicord_utils_DPERMS.CREATE_INSTANT_INVITE,haxicord_utils_DPERMS.KICK_MEMBERS,haxicord_utils_DPERMS.BAN_MEMBERS,haxicord_utils_DPERMS.ADMINISTRATOR,haxicord_utils_DPERMS.MANAGE_CHANNELS,haxicord_utils_DPERMS.MANAGE_GUILD,haxicord_utils_DPERMS.ADD_REACTIONS,haxicord_utils_DPERMS.VIEW_AUDIT_LOG,haxicord_utils_DPERMS.VIEW_CHANNEL,haxicord_utils_DPERMS.SEND_MESSAGES,haxicord_utils_DPERMS.SEND_TTS_MESSAGES,haxicord_utils_DPERMS.MANAGE_MESSAGES,haxicord_utils_DPERMS.EMBED_LINKS,haxicord_utils_DPERMS.ATTACH_FILES,haxicord_utils_DPERMS.READ_MESSAGE_HISTORY,haxicord_utils_DPERMS.MENTION_EVERYONE,haxicord_utils_DPERMS.USE_EXTERNAL_EMOJIS,haxicord_utils_DPERMS.CONNECT,haxicord_utils_DPERMS.SPEAK,haxicord_utils_DPERMS.MUTE_MEMBERS,haxicord_utils_DPERMS.DEAFEN_MEMBERS,haxicord_utils_DPERMS.MOVE_MEMBERS,haxicord_utils_DPERMS.USE_VAD,haxicord_utils_DPERMS.PRIORITY_SPEAKER,haxicord_utils_DPERMS.CHANGE_NICKNAME,haxicord_utils_DPERMS.MANAGE_NICKNAMES,haxicord_utils_DPERMS.MANAGE_ROLES,haxicord_utils_DPERMS.MANAGE_WEBHOOKS,haxicord_utils_DPERMS.MANAGE_EMOJIS];
 haxicord_websocket_WebSocketConnection.ZLIB_SUFFIX = "0000ffff";
-haxicord_websocket_WebSocketConnection.BUFFER_SIZE = 1048576;
-hscript_Parser.p1 = 0;
-hscript_Parser.tokenMin = 0;
-hscript_Parser.tokenMax = 0;
 {
 	Bot.main();
 	haxe_EntryPoint.run();

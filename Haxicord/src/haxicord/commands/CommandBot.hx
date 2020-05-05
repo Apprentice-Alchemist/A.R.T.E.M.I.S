@@ -1,5 +1,8 @@
 package haxicord.commands;
 
+import sys.io.File;
+import haxe.zip.Uncompress;
+import haxe.rtti.Rtti;
 import haxicord.types.Message;
 import haxicord.types.MessageChannel;
 import haxe.rtti.Meta;
@@ -31,6 +34,7 @@ class CommandBot {
     private function new(token:String, commandBot:Class<CommandBot>, _prefix = "!", tagPrefix=true, etf=false, zlib=true, block=true, shardInfo=null) {
         try{
         var annr = Meta.getFields(commandBot);
+        
         for(comName in Reflect.fields(annr)) {
             var com:haxe.DynamicAccess<Dynamic> = Reflect.field(annr, comName);
             var params:CommandParams = null;

@@ -1,9 +1,11 @@
 -debug
+--verbose
+-dce full
 #-resource auth.json
+-lib ModioHx
 -lib hscript
 -lib hxnodejs
 -cp Source
 -cp Haxicord/src
 -main Bot
--D nodejs
 -js node/bot.js

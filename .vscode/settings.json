@@ -1,0 +1,12 @@
+{
+    "haxe.configurations":[
+        "NodeJS",[
+        "-lib hxnodejs",
+        "-lib hscript",
+        "-D nodejs",
+        "-cp Haxicord/src",
+        "-cp Source",
+        "-js node/bot.js"
+        ]
+    ]
+}

@@ -29,7 +29,7 @@ class MessageHandler {
             m.reply({content: "Sorry, I'll do better next time."});
             trace("message handled");
 			return true;
-        } else if(m.mentions.lastIndexOf(Bot.bot.user) != null){
+        } else if(m.mentions.lastIndexOf(Bot.bot.user) > -1){
             m.reply({content: "Hello, did you call me? If you want to know what I can do type `]help`!"});
             return true;
         }

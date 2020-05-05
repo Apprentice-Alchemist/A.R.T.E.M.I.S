@@ -2,11 +2,12 @@ package haxicord.utils;
 
 //I honestly forget why this file is necessary but it exists already so we're too deep. I think it had something to do with C# not working properly?
 
-import js.node.url.URL;
+
 import haxe.Json;
 import haxe.Timer;
 import haxicord.DiscordClient;
 #if (js&&nodejs)
+import js.node.url.URL;
 import haxe.extern.EitherType;
 import js.node.Url;
 import js.node.Querystring;
@@ -194,7 +195,7 @@ class Https{
                 }
             '
         ,cscb);
-#else
+#elseif !(js&&nodejs)
         var call = new Http(url);
         #if sys
         call.noShutdown = true;

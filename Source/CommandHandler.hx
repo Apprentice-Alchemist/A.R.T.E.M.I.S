@@ -5,9 +5,11 @@ import haxicord.types.Message;
 import commands.Command;
 import commands.*;
 
+// @:build(bot.macro.CommandBuild.run('commands'))
 class CommandHandler {
 	public static var bot:DiscordClient;
 	public static var has_init:Bool = false;
+	
 	public static var commands:Map<String, Command> = new Map<String, Command>();
 
 	public static function init(_bot) {
@@ -15,6 +17,7 @@ class CommandHandler {
 		bot = _bot;
 		addCommand("kick",new Kick());
 		addCommand("mod",new Mod());
+		// addCommand("js",new commands.Js());
 	}
 
 	public static function addCommand(cname:String, cclass) {

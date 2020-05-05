@@ -115,7 +115,6 @@ class DiscordClient {
 
     private var zlibCompress:Bool = false;
     private var etfFormat:Bool = false;
-
     
     private var webSocketMessages:Array<String>;
     private var webSocketProcessTimer:Timer;
@@ -151,23 +150,15 @@ class DiscordClient {
             this.dataCache = _storage;
         }
 
-        //trace("Getting gotten");
         trace("Starting Client");
         endpoints.getGateway(isBot, connect);
 
-#if (js&&nodejs)
-        // needs a main event or the event loop closes and the bot hangs. isnt nodejs great?
+        #if (js&&nodejs)
         haxe.MainLoop.add(tick);
-#end
+        #end
     }
     
-    public function tick(){
-    }
-
-    /**
-        This no longer has any function. Threads are all dependant on mainloop.
-     */
-     @:deprecated public function start() {}
+    public function tick(){}
 
 //Flowchart
     @:dox(hide)
@@ -201,16 +192,17 @@ class DiscordClient {
 
                 if(session == "") 
                     resumeable = false; //can't be resumed if i don't have a session
-
+                switch m {
+                    default: //do nothing rn
+                }
                 trace("Socket Closed with code " + m  +", Re-Opening in " + this.reconnectTimeout + "s. " + (resumeable?"Resuming":""));
-
-                Timer.delay(connect.bind(gateway,error), this.reconnectTimeout * 1000);
-                this.reconnectTimeout = Math.floor(Math.min(this.reconnectTimeout*2,300)); // double until 300s (5m)
+                // Timer.delay(endpoints.getGateway.bind(true,connect), this.reconnectTimeout * 1000);
+                // this.reconnectTimeout = Math.floor(Math.min(this.reconnectTimeout*2,300)); // double until 300s (5m)
+                Bot.start();
             }
 
             ws.onError = function(e) {
                 resumeable = false;
-
                 trace("Websocket errored!");
                 trace(e);
             }
