@@ -20,7 +20,8 @@ jobs:
         haxelib install hscript --quiet
         haxelib install hxnodejs --quiet
         haxelib install Haxicord --quiet
-        haxelib git discordjs https://github.com/Jarrio/Haxe-DiscordJs --quiet
+        haxelib git discordjs https://github.com/Apprentice-Alchemist/Haxe-DiscordJs --quiet
+        haxelib git ModioHx https://github.com/Apprentice-Alchemist/ModioHx --quiet
     - name: Build
       run: |
        haxe build.hxml
