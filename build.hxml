@@ -1,5 +1,4 @@
 -debug
---verbose
 -dce full
 --macro bot.macro.Package.generate("node/package.json")
 

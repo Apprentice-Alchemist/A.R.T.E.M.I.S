@@ -12,7 +12,7 @@ jobs:
     - name: Setup    
       uses: krdlab/setup-haxe@master
       with:
-          haxe-version: 4.0.5
+          haxe-version: 4.1.0
     - name: Haxelibs
       run: |
         mkdir $GITHUB_WORKSPACE/.haxelib
