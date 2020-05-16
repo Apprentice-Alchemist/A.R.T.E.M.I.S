@@ -1,7 +1,6 @@
 package commands;
 
-import haxicord.DiscordClient;
-import haxicord.types.Message;
+import discordjs.*;
 
 class Command {
 	public function new(){}
@@ -14,8 +13,8 @@ class Command {
 	public function longHelp(){
 		return longhelp;
 	}
-	public function _call(m:Message,b:DiscordClient){}
-	public dynamic function call(_msg:Message, _bot:DiscordClient) {
+	public function _call(m:Message,b:Client){}
+	public dynamic function call(_msg:Message, _bot:Client) {
 		_call(_msg,_bot);
 		trace("Command " + this.name + " used by : " + _msg.author.username);
 	}

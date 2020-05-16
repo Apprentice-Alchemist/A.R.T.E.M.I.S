@@ -1,5 +1,6 @@
 auth.json
-logs.json
+logs.*
 node_modules/*
 libs/*
 *.hl
+Haxicord/*

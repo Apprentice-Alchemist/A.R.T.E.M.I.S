@@ -1,11 +1,15 @@
 -debug
 --verbose
 -dce full
-#-resource auth.json
+--macro bot.macro.Package.generate("node/package.json")
+
 -lib ModioHx
 -lib hscript
 -lib hxnodejs
+-lib discordjs
 -cp Source
--cp Haxicord/src
+
+
 -main Bot
+
 -js node/bot.js

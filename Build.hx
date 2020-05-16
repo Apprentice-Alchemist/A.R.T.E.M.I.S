@@ -40,7 +40,7 @@ class Build {
 	}
 
     public static function main(){
-        File.write("node/Procfile").writeString("worker: node bot.js");
+        File.write("node/Procfile").writeString("worker: node/bot.js");
         File.write("node/package.json").writeString(Json.stringify(packageJson));
         File.write("node/package-lock.json").writeString(Json.stringify(packageLockJson));
         Sys.exit(0);

@@ -1,7 +1,6 @@
 package commands;
 
-import haxicord.types.Message;
-import haxicord.DiscordClient;
+import discordjs.*;
 
 class Js extends Command {
 	override public function new() {
@@ -11,10 +10,10 @@ class Js extends Command {
 		super();
 	}
 
-	override public function _call(m:Message, b:DiscordClient) {
+	override public function _call(m:Message, b:Client) {
         var req = new haxe.Http("https://fancyfishgames.com/Aground/play/Aground.js");
         req.onData = function(e){
-			m.reply({content: "The latest Js",file: e});
+			// m.reply("Do);
         }
         req.onStatus = function(e){
             trace("Status : " + e);

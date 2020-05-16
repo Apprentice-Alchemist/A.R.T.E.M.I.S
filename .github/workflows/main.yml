@@ -13,14 +13,14 @@ jobs:
       uses: krdlab/setup-haxe@master
       with:
           haxe-version: 4.0.5
-    - name: Haxelib
+    - name: Haxelibs
       run: |
         mkdir $GITHUB_WORKSPACE/.haxelib
         haxelib setup $GITHUB_WORKSPACE/.haxelib
         haxelib install hscript --quiet
         haxelib install hxnodejs --quiet
         haxelib install Haxicord --quiet
-        haxelib list
+        haxelib git discordjs https://github.com/Jarrio/Haxe-DiscordJs --quiet
     - name: Build
       run: |
        haxe build.hxml

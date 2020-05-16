@@ -1,32 +1,25 @@
 package bot.macro;
 
+import haxe.Exception;
 import sys.FileSystem;
-#if macro
+
 import haxe.macro.*;
-#end
+
 class Package {
-    #if macro
-    public function generate(path:String = "package.json"){
-        // Context.onGenerate(function(_){
-        //     var package:Package = {
-        //         name: "Artemis",
-        //         description: "N/A",
-        //         dependencies: {pako: "1.0.11",ws: "7.2.3"},
-        //         engines:{node: "12.x"},
-        //         version: Bot.VERSION,
-        //         scripts: {}
-        //     }
-        // File.write(path).writeString(Json.stringify(package));
-        // });
-    }
-    #end
+    public static function generate(path:String){
+        try{
+        Context.onAfterGenerate(function(){
+            
+        });
+    }catch(e:Exception){trace(e.message + e.stack);}
+    }    
 }
-typedef Package = {
+typedef PackageFile = {
     var name:String;
     var description:String;
-    @:optional var dependencies;
-    @:optional var devDependencies;
-    @:optional var engines;    
+    @:optional var dependencies:Map<String,String>;
+	@:optional var devDependenciesMap: Map<String,String>;
+	@:optional var engines:Map<String, String>;    
 }
 // {
 // 	"name": "Artemis",
