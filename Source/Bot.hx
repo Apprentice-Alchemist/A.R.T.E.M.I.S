@@ -1,5 +1,7 @@
 package;
 
+import discordjs.MessageEmbed;
+import discordjs.TextChannel;
 import haxe.Exception;
 import discordjs.Client;
 import lib.JsonHandler;
@@ -42,7 +44,14 @@ class Bot {
 	public static function start(){
 		bot = new discordjs.Client();
 		bot.on("ready",function(e){
-			bot.channels.fetch("704748213655175300",false);
+			var ch:js.lib.Promise<TextChannel> = (cast bot.channels.fetch("704748213655175300", false)).then(function(e) {
+				var embed = new MessageEmbed();
+				embed.setAuthor("Artemis v" + VERSION,bot.user.defaultAvatarURL);
+				embed.setColor(ColorResolvableData.BLUE);
+				embed.setTimestamp(Date.now());
+				embed.setDescription("Artemis Initialized.");
+				e.send(embed);
+			});
 		});
 		bot.on("message",CommandHandler.handle);
 		bot.login(getToken()).then(function(e){trace("Ready!");});
