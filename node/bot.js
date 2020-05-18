@@ -49,12 +49,13 @@ Bot.start = function() {
 			embed.setAuthor("Artemis v" + "0.0.1",Bot.bot.user.defaultAvatarURL);
 			embed.setColor("BLUE");
 			embed.setTimestamp(new Date());
+			embed.setDescription("Artemis Initialized.");
 			e.send(embed);
 		});
 	});
 	Bot.bot.on("message",CommandHandler.handle);
 	Bot.bot.login(Bot.getToken()).then(function(e) {
-		haxe_Log.trace("Ready!",{ fileName : "Source/Bot.hx", lineNumber : 56, className : "Bot", methodName : "start"});
+		haxe_Log.trace("Ready!",{ fileName : "Source/Bot.hx", lineNumber : 57, className : "Bot", methodName : "start"});
 	});
 };
 Bot.getToken = function() {
@@ -70,6 +71,50 @@ Bot.getModioKey = function() {
 	} else {
 		return process.env["modio_key"].toString();
 	}
+};
+var haxe_IMap = function() { };
+$hxClasses["haxe.IMap"] = haxe_IMap;
+haxe_IMap.__name__ = true;
+haxe_IMap.__isInterface__ = true;
+haxe_IMap.prototype = {
+	__class__: haxe_IMap
+};
+var haxe_ds_StringMap = function() {
+	this.h = Object.create(null);
+};
+$hxClasses["haxe.ds.StringMap"] = haxe_ds_StringMap;
+haxe_ds_StringMap.__name__ = true;
+haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
+haxe_ds_StringMap.keysIterator = function(h) {
+	var keys = Object.keys(h);
+	var len = keys.length;
+	var idx = 0;
+	return { hasNext : function() {
+		return idx < len;
+	}, next : function() {
+		idx += 1;
+		return keys[idx - 1];
+	}};
+};
+haxe_ds_StringMap.valueIterator = function(h) {
+	var keys = Object.keys(h);
+	var len = keys.length;
+	var idx = 0;
+	return { hasNext : function() {
+		return idx < len;
+	}, next : function() {
+		idx += 1;
+		return h[keys[idx - 1]];
+	}};
+};
+haxe_ds_StringMap.prototype = {
+	get: function(key) {
+		return this.h[key];
+	}
+	,set: function(key,value) {
+		this.h[key] = value;
+	}
+	,__class__: haxe_ds_StringMap
 };
 var CommandHandler = function() { };
 $hxClasses["CommandHandler"] = CommandHandler;
@@ -442,13 +487,19 @@ commands_Command.prototype = {
 	,__class__: commands_Command
 };
 var commands_Kick = function() {
+	this.name = "kick";
+	this.shorthelp = "Kicks the mentioned user.";
+	this.longhelp = "Usage : `]kick user \"reason\"`";
 	commands_Command.call(this);
 };
 $hxClasses["commands.Kick"] = commands_Kick;
 commands_Kick.__name__ = true;
 commands_Kick.__super__ = commands_Command;
 commands_Kick.prototype = $extend(commands_Command.prototype,{
-	__class__: commands_Kick
+	_call: function(m,b) {
+		m.channel.send("Not implemented yet!");
+	}
+	,__class__: commands_Kick
 });
 var commands_Mod = function() {
 	commands_Command.call(this);
@@ -667,13 +718,6 @@ haxe_CallStack.itemToString = function(b,s) {
 		b.b += n == null ? "null" : "" + n;
 		break;
 	}
-};
-var haxe_IMap = function() { };
-$hxClasses["haxe.IMap"] = haxe_IMap;
-haxe_IMap.__name__ = true;
-haxe_IMap.__isInterface__ = true;
-haxe_IMap.prototype = {
-	__class__: haxe_IMap
 };
 var haxe_EntryPoint = function() { };
 $hxClasses["haxe.EntryPoint"] = haxe_EntryPoint;
@@ -1230,43 +1274,6 @@ haxe_ds_ObjectMap.prototype = {
 		return this.h[key.__id__];
 	}
 	,__class__: haxe_ds_ObjectMap
-};
-var haxe_ds_StringMap = function() {
-	this.h = Object.create(null);
-};
-$hxClasses["haxe.ds.StringMap"] = haxe_ds_StringMap;
-haxe_ds_StringMap.__name__ = true;
-haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
-haxe_ds_StringMap.keysIterator = function(h) {
-	var keys = Object.keys(h);
-	var len = keys.length;
-	var idx = 0;
-	return { hasNext : function() {
-		return idx < len;
-	}, next : function() {
-		idx += 1;
-		return keys[idx - 1];
-	}};
-};
-haxe_ds_StringMap.valueIterator = function(h) {
-	var keys = Object.keys(h);
-	var len = keys.length;
-	var idx = 0;
-	return { hasNext : function() {
-		return idx < len;
-	}, next : function() {
-		idx += 1;
-		return h[keys[idx - 1]];
-	}};
-};
-haxe_ds_StringMap.prototype = {
-	get: function(key) {
-		return this.h[key];
-	}
-	,set: function(key,value) {
-		this.h[key] = value;
-	}
-	,__class__: haxe_ds_StringMap
 };
 var haxe_http_HttpBase = function(url) {
 	this.url = url;

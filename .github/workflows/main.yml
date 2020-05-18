@@ -9,20 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2  
-    - name: Setup    
-      uses: krdlab/setup-haxe@master
-      with:
-          haxe-version: 4.1.0
-    - name: Haxelibs
-      run: |
-        haxelib install hscript --quiet
-        haxelib install hxnodejs --quiet
-        haxelib git discordjs https://github.com/Apprentice-Alchemist/Haxe-DiscordJs --quiet
-        haxelib git ModioHx https://github.com/Apprentice-Alchemist/ModioHx --quiet
-    - name: Build
-      run: |
-       haxe build.hxml
-       haxe --run Build
+    # - name: Setup    
+    #   uses: krdlab/setup-haxe@master
+    #   with:
+    #       haxe-version: 4.1.0
+    # - name: Haxelibs
+    #   run: |
+    #     haxelib install hscript --quiet
+    #     haxelib install hxnodejs --quiet
+    #     haxelib git discordjs https://github.com/Apprentice-Alchemist/Haxe-DiscordJs --quiet
+    #     haxelib git ModioHx https://github.com/Apprentice-Alchemist/ModioHx --quiet
+    # - name: Build
+    #   run: |
+    #    haxe build.hxml
+    #    haxe --run Build
     - name: Deploy
       uses: akhileshns/heroku-deploy@v3.0.4
       with:
