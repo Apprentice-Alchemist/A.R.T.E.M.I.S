@@ -29,7 +29,7 @@ class Build {
 		},
 		"dependencies": {
 			"pako": "1.0.11",
-			"ws": "7.2.3"
+      "ws": "7.2.3"
 		},
 		"devDependencies": {
 			"nodemon": "2.0.2"

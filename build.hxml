@@ -1,10 +1,12 @@
--debug
 -dce full
---macro bot.macro.Package.generate("node/package.json")
+# --macro bot.macro.Package.generate("node/package.json")
 -lib ModioHx
 -lib hscript
 -lib hxnodejs
 -lib discordjs
+
 -cp Source
+
 -main Bot
--js node/bot.js
+
+-js bot.js

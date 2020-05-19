@@ -72,50 +72,6 @@ Bot.getModioKey = function() {
 		return process.env["modio_key"].toString();
 	}
 };
-var haxe_IMap = function() { };
-$hxClasses["haxe.IMap"] = haxe_IMap;
-haxe_IMap.__name__ = true;
-haxe_IMap.__isInterface__ = true;
-haxe_IMap.prototype = {
-	__class__: haxe_IMap
-};
-var haxe_ds_StringMap = function() {
-	this.h = Object.create(null);
-};
-$hxClasses["haxe.ds.StringMap"] = haxe_ds_StringMap;
-haxe_ds_StringMap.__name__ = true;
-haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
-haxe_ds_StringMap.keysIterator = function(h) {
-	var keys = Object.keys(h);
-	var len = keys.length;
-	var idx = 0;
-	return { hasNext : function() {
-		return idx < len;
-	}, next : function() {
-		idx += 1;
-		return keys[idx - 1];
-	}};
-};
-haxe_ds_StringMap.valueIterator = function(h) {
-	var keys = Object.keys(h);
-	var len = keys.length;
-	var idx = 0;
-	return { hasNext : function() {
-		return idx < len;
-	}, next : function() {
-		idx += 1;
-		return h[keys[idx - 1]];
-	}};
-};
-haxe_ds_StringMap.prototype = {
-	get: function(key) {
-		return this.h[key];
-	}
-	,set: function(key,value) {
-		this.h[key] = value;
-	}
-	,__class__: haxe_ds_StringMap
-};
 var CommandHandler = function() { };
 $hxClasses["CommandHandler"] = CommandHandler;
 CommandHandler.__name__ = true;
@@ -497,7 +453,25 @@ commands_Kick.__name__ = true;
 commands_Kick.__super__ = commands_Command;
 commands_Kick.prototype = $extend(commands_Command.prototype,{
 	_call: function(m,b) {
-		m.channel.send("Not implemented yet!");
+		m.guild.members.fetch(m.author.id).then(function(e) {
+			if(e.hasPermission("KICK_MEMBERS",{ })) {
+				var m1 = m.guild.members;
+				var jsIterator = m.mentions.users.values();
+				var _this_jsIterator = jsIterator;
+				var _this_lastStep = jsIterator.next();
+				var v = _this_lastStep.value;
+				_this_lastStep = _this_jsIterator.next();
+				m1.fetch(v.id).then(function(e) {
+					if(e.kickable) {
+						e.kick();
+					} else {
+						m.reply("Failed to kick user!");
+					}
+				});
+			} else {
+				m.reply("You do not have the required permissions to kick users!");
+			}
+		});
 	}
 	,__class__: commands_Kick
 });
@@ -718,6 +692,13 @@ haxe_CallStack.itemToString = function(b,s) {
 		b.b += n == null ? "null" : "" + n;
 		break;
 	}
+};
+var haxe_IMap = function() { };
+$hxClasses["haxe.IMap"] = haxe_IMap;
+haxe_IMap.__name__ = true;
+haxe_IMap.__isInterface__ = true;
+haxe_IMap.prototype = {
+	__class__: haxe_IMap
 };
 var haxe_EntryPoint = function() { };
 $hxClasses["haxe.EntryPoint"] = haxe_EntryPoint;
@@ -1274,6 +1255,43 @@ haxe_ds_ObjectMap.prototype = {
 		return this.h[key.__id__];
 	}
 	,__class__: haxe_ds_ObjectMap
+};
+var haxe_ds_StringMap = function() {
+	this.h = Object.create(null);
+};
+$hxClasses["haxe.ds.StringMap"] = haxe_ds_StringMap;
+haxe_ds_StringMap.__name__ = true;
+haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
+haxe_ds_StringMap.keysIterator = function(h) {
+	var keys = Object.keys(h);
+	var len = keys.length;
+	var idx = 0;
+	return { hasNext : function() {
+		return idx < len;
+	}, next : function() {
+		idx += 1;
+		return keys[idx - 1];
+	}};
+};
+haxe_ds_StringMap.valueIterator = function(h) {
+	var keys = Object.keys(h);
+	var len = keys.length;
+	var idx = 0;
+	return { hasNext : function() {
+		return idx < len;
+	}, next : function() {
+		idx += 1;
+		return h[keys[idx - 1]];
+	}};
+};
+haxe_ds_StringMap.prototype = {
+	get: function(key) {
+		return this.h[key];
+	}
+	,set: function(key,value) {
+		this.h[key] = value;
+	}
+	,__class__: haxe_ds_StringMap
 };
 var haxe_http_HttpBase = function(url) {
 	this.url = url;
@@ -2915,5 +2933,3 @@ haxe_EntryPoint.threadCount = 0;
 	haxe_EntryPoint.run();
 }
 })(typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
-
-//# sourceMappingURL=bot.js.map

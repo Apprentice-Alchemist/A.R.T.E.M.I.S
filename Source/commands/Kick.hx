@@ -22,9 +22,18 @@ class Kick extends Command {
         // }else{
         //     m.reply({content: "You do not have the required permissions to kick that user!"});
         // }
-        // if(m.guild.members.fetch(m.author.id).then(function(e){e.hasPermission("KICK_MEMBERS");})){
-        //    if(true){
-            m.channel.send("Not implemented yet!");
-        //    }
+        m.guild.members.fetch(m.author.id).then(function(e){if(e.hasPermission("KICK_MEMBERS",{})){
+            m.guild.members.fetch(m.mentions.users.iterator().next().id).then(function(e){
+                if(e.kickable){
+                    var reason = m.content.substr(m.content.indexOf(">"));
+                    e.send("You were kicked from " + e.guild.name + " because : " + reason);
+                    e.kick();
+                }else{
+                    m.reply("Failed to kick user!");
+                }
+            });
+        }else {
+            m.reply("You do not have the required permissions to kick users!");
+        }});
        }
     }
