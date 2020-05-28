@@ -29,18 +29,6 @@ jobs:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: ${{secrets.HEROKU_APP}}
         heroku_email: ${{secrets.HEROKU_EMAIL}}
-      #    git push https://heroku:$HEROKU_API_TOKEN@git.heroku.com/$HEROKU_APP_NAME.git git subtree split --prefix=node origin/master:master --force
-      # env:
-      #   HEROKU_API_TOKEN: ${{ secrets.HEROKU_API_Key }}
-      #   HEROKU_APP_NAME: ${{secrets.HEROKU_APP}}
-      #   HEROKU_EMAIL: ${{secrets.HEROKU_EMAIL}}
-      # if: github.ref == 'refs/heads/master' && job.status == 'success'
-      # run: |
-      #   git config user.email $HEROKU_EMAIL
-      #   git config user.name "Apprentice Alchemist"
-      #   git add --all
-      #   git commit -m ...
-      #   git push --force https://heroku:$HEROKU_API_TOKEN@git.heroku.com/$HEROKU_APP_NAME.git \`git subtree split --prefix=${appdir} ${branch}\`:refs/heads/master
     - name: Notify Discord (success)
       uses: appleboy/discord-action@master
       with:
@@ -48,7 +36,6 @@ jobs:
         webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
         color: "#00C07F"
         message: "Build and Deploy succeeded!"
-
     - name: Notify Discord (failure)
       uses: appleboy/discord-action@master
       if: failure()

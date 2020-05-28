@@ -12,18 +12,8 @@ class Kick extends Command {
         super();
     }
     override public function _call(m:Message,b:DiscordClient){
-        // var u = m.getMember();        
-		// var kick = m.content.split(" ")[1].split("<@").join("").split(">").join("");
-        // if(UserService.canKick(u)){
-        //     try{
-        //     m.getGuild().getMember(m.mentions[0].id.id,function(e){e.kick();});
-        //     Bot.bot.getUser(kick,function(e){m.reply({content: "User kicked : " + e.username});});
-        //     }catch(e:Dynamic){m.reply({content: "An error occured while kicking : " + Std.string(e)});}
-        // }else{
-        //     m.reply({content: "You do not have the required permissions to kick that user!"});
-        // }
-        m.guild.members.fetch(m.author.id).then(function(e){if(e.hasPermission("KICK_MEMBERS",{})){
-            m.guild.members.fetch(m.mentions.users.iterator().next().id).then(function(e){
+        m.guild.members.fetch(m.author.id).then(function(e){if(e.hasPermission("KICK_MEMBERS",{admin_override: true,owner_override: true})){
+            m.guild.members.fetch(m.mentions.users.entries().next().value.value.id).then(function(e){
                 if(e.kickable){
                     var reason = m.content.substr(m.content.indexOf(">"));
                     e.send("You were kicked from " + e.guild.name + " because : " + reason);

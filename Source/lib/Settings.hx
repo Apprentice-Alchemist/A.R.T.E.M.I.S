@@ -1,13 +1,31 @@
 package lib;
 
+import haxe.io.Output;
 import sys.FileSystem;
 import haxe.Log;
 import sys.io.File;
 import haxe.Json;
 
 class Settings {
-	static function getUser(id:String) {}
-	static function getGuild(id:String) {}
+	static var _settings:Dynamic;
+	public static function load(){
+		if (!FileSystem.exists("settings.json")) {
+			File.saveContent("settings.json", "{users:[],guild:[]}");
+		}
+		_settings = Json.parse(File.getContent("settings.json"));
+	}
+	public static function save(){
+		File.saveContent("settings.json",Json.stringify(_settings));
+	}
+	public static function set(t:Dynamic,value:Dynamic){
+		t = value;
+		save();
+
+	}
+	public static function getUser(id:String) {
+		
+	}
+	public static function getGuild(id:String) {}
 }
 class Logger{
 	public static function addLog(v, ?infos) {
