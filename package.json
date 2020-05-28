@@ -4,7 +4,7 @@
     "repository": {"url": "https://github.com/Apprentice-Alchemist/A.R.T.E.M.I.S"},
     "bugs": {"url": "https://github.com/Apprentice-Alchemist/A.R.T.E.M.I.S/issues"},
     "description": "A discord bot",
-    "main": "Bot.js",
+    "main": "bot.js",
     "version": "0.0.1",
     "engines": {
         "node": "12.x"
@@ -16,7 +16,7 @@
         "nodemon": "2.0.4"
     },
     "scripts": {
-        "start": "nodemon Bot.js --ignore *.json",
+        "start": "nodemon bot.js --ignore *.json",
         "test": "haxe build.hxml && npm start"
     }
 }
