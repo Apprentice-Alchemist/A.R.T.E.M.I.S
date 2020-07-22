@@ -32,6 +32,7 @@ class CommandHandler {
 					embed.addField("Host OS",Sys.systemName());
 					embed.addField("Start Time",Bot.startTime.toString());
 					m.channel.send(embed);
+					return true;
 				case "help":
 					var commands = getCommands();
 					var b = new StringBuf();
