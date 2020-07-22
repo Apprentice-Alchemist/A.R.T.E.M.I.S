@@ -1,44 +1,48 @@
 package;
 
 import haxe.Exception;
-import discordjs.MessageEmbed;
-import discordjs.TextChannel;
 import discordjs.Client;
+import discordjs.Message;
 import lib.JsonHandler;
-import lib.Settings.Logger;
 
 class Bot {
-	public static inline var VERSION:String = "0.0.1";
 	public static var bot:Client;
 	public static var prefix:String = "]";
 	public static var startTime:Date;
 
 	public static function main() {
-		Logger.setTrace();
+		lib.Logger.setTrace();
 		start();
 	}
 
 	public static function start() {
 		bot = new discordjs.Client();
-		bot.once("ready", function(e) {
-			var ch:js.lib.Promise<TextChannel> = (cast bot.channels.fetch("704748213655175300", false)).then(function(e) {
-				var embed = new MessageEmbed();
-				embed.setAuthor("Artemis v" + VERSION, bot.user.defaultAvatarURL);
-				embed.setColor(ColorResolvableData.BLUE);
-				embed.setTimestamp(Date.now());
-				embed.setDescription("Artemis Initialized.");
-				e.send(embed);
+		bot.on("ready", function(e) {
+			bot.user.setPresence({
+				status: ONLINE,
+				activity: {
+					type: WATCHING,
+					name: "you."
+				},
+				afk: false,
 			});
 		});
-		bot.on("message", function(m) {
+		bot.on("message", function(m:Message) {
 			try {
-				CommandHandler.handle(m);
-			} catch (e:Exception) {
-				m.channel.send("An error occured while executing this command! \n" + "Logs : \n" + e.details().substr(0, 1000));
+				if(m.author.bot){
+					return;
+				} else if(CommandHandler.handle(m)){
+					return;
+				} else {
+					MessageHandler.handle(m);
+				}
+			} catch (err:Exception) {
+				m.channel.send("BORK BORK BORK! AN ERROR HAS OCCURED! <@525025580106907659> \n" + err.message);
 			}
 		});
 		bot.login(getToken()).then(function(e) {
 			trace("Ready!");
+			startTime = Date.now();
 		}, function(e) {
 			trace(e);
 			haxe.Timer.delay(start, 5000);
@@ -49,12 +53,12 @@ class Bot {
 		trace("Ready!");
 		trace("Invite link : " + bot.generateInvite(["ADMINISTATOR"]));
 	}
-
-	public static function getToken() {
+	
+	static function getToken() {
 		return JsonHandler.canRead("auth.json") ? JsonHandler.read("auth.json").token : Sys.getEnv("token").toString();
 	}
 
-	public static function getModioKey() {
+	static function getModioKey() {
 		return JsonHandler.canRead("auth.json") ? JsonHandler.read("auth.json").modio_key : Sys.getEnv("modio_key").toString();
 	}
 }

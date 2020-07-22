@@ -1,0 +1,7 @@
+-lib ModioHx
+-lib hscript
+-lib hxnodejs
+-lib discordjs
+-cp Source
+-main Bot
+-js bot.js

@@ -1,4 +1,5 @@
 auth.json
+settings.json
 logs.*
 node_modules/*
 libs/*

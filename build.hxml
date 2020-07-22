@@ -1,4 +1,10 @@
 -dce no
+# Defines
+-D js-es=6
+-D haxeJSON
+# --macro include("commands")
+--macro lib.Macro.include()
+# Libraries
 -lib ModioHx
 -lib hscript
 -lib hxnodejs
@@ -7,5 +13,4 @@
 -cp Source
 
 -main Bot
-
 -js bot.js

@@ -1,4 +1,6 @@
 package lib;
+import haxe.crypto.Sha224;
+import haxe.crypto.Sha1;
 import haxe.Log;
 import haxe.ds.StringMap;
 import hscript.*;
@@ -12,12 +14,23 @@ class EvalHandler {
     public var parser:Parser;
     function loadVars(v:StringMap<Dynamic>){
         v.clear();
+        v.set("true",true);
+        v.set("false",false);
+        v.set("null",null);
         v.set("Math",Math);
         v.set("trace",doTrace);
-        v.set("Logger",lib.Settings.Logger);
+        v.set("Logger",lib.Logger);
         v.set("Settings",lib.Settings);
         v.set("Type",Type);
         v.set("Reflect",Reflect);
+        v.set("Bot",Bot);
+        v.set("CommandHandler",CommandHandler);
+        v.set("MessageHandler",MessageHandler);
+        v.set("EReg",EReg);
+        v.set("getVars",function(){
+            return interp.variables;
+        });
+        
     }
     var logs:Array<String>;
     public function doTrace(s:Dynamic){
