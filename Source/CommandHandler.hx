@@ -27,6 +27,7 @@ class CommandHandler {
 			switch command
 			{
 				case "info":
+					trace("info");
 					var embed = new MessageEmbed();
 					embed.setTitle("Info").setColor(Color.BLUE);
 					embed.addField("Host OS",Sys.systemName());

@@ -3510,6 +3510,14 @@ class CommandHandler {
 				embed.setDescription(b_b);
 				m.channel.send(embed);
 				return true;
+			case "info":
+				haxe_Log.trace("info",{ fileName : "Source/CommandHandler.hx", lineNumber : 30, className : "CommandHandler", methodName : "handle"});
+				let embed1 = new discordjs_MessageEmbed();
+				embed1.setTitle("Info").setColor("BLUE");
+				embed1.addField("Host OS",Sys.systemName());
+				embed1.addField("Start Time",HxOverrides.dateStr(Bot.startTime));
+				m.channel.send(embed1);
+				return true;
 			case "logs":
 				m.channel.send(null,{ files : [{ name : "logs.txt", attachment : js_node_buffer_Buffer.from(js_node_Fs.readFileSync("logs.txt",{ encoding : "utf8"}))}]});
 				return true;
@@ -3544,16 +3552,16 @@ class CommandHandler {
 		}
 		let content = HxOverrides.substr(m.content,(Bot.prefix + "config ").length,null);
 		let args = content.split(" ");
-		haxe_Log.trace(args.join("$"),{ fileName : "Source/CommandHandler.hx", lineNumber : 73, className : "CommandHandler", methodName : "config"});
+		haxe_Log.trace(args.join("$"),{ fileName : "Source/CommandHandler.hx", lineNumber : 81, className : "CommandHandler", methodName : "config"});
 		let it_current = 0;
 		let it_array = args;
 		let switches_h = Object.create(null);
 		while(it_current < it_array.length) {
 			let arg = it_array[it_current++];
-			haxe_Log.trace("arg " + arg,{ fileName : "Source/CommandHandler.hx", lineNumber : 79, className : "CommandHandler", methodName : "config"});
+			haxe_Log.trace("arg " + arg,{ fileName : "Source/CommandHandler.hx", lineNumber : 87, className : "CommandHandler", methodName : "config"});
 			if(StringTools.startsWith(arg,"--")) {
 				let val = it_array[it_current++];
-				haxe_Log.trace("value " + val,{ fileName : "Source/CommandHandler.hx", lineNumber : 83, className : "CommandHandler", methodName : "config"});
+				haxe_Log.trace("value " + val,{ fileName : "Source/CommandHandler.hx", lineNumber : 91, className : "CommandHandler", methodName : "config"});
 				switches_h[HxOverrides.substr(arg,2,null)] = val;
 				continue;
 			}
