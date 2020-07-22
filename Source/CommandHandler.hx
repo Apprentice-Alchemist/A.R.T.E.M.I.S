@@ -26,6 +26,12 @@ class CommandHandler {
 			var command = m.content.substring(Bot.prefix.length, m.content.indexOf(" ") > 0 ? m.content.indexOf(" ") : m.content.length);
 			switch command
 			{
+				case "info":
+					var embed = new MessageEmbed();
+					embed.setTitle("Info").setColor(Color.BLUE);
+					embed.addField("Host OS",Sys.systemName());
+					embed.addField("Start Time",Bot.startTime.toString());
+					m.channel.send(embed);
 				case "help":
 					var commands = getCommands();
 					var b = new StringBuf();
