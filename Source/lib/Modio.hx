@@ -1,5 +1,8 @@
 package lib;
 
+import js.node.url.URL;
+import haxe.DynamicAccess;
+import js.node.Https;
 import haxe.Json;
 import haxe.Http;
 
@@ -15,9 +18,7 @@ class Modio {
 	// }
 	public static function makeRequest(full_path){
 		var promise = new TPromise<Dynamic>();
-		var req = new Http(full_path);
-		
-		req.setHeader("Content-Type", "application-json");
+		var req = new haxe.http.HttpNodeJs(full_path);
 		req.addParameter("port", "443");
 		req.onData = function(e) {
 			trace("Modio Data");
@@ -31,6 +32,7 @@ class Modio {
 			trace("Modio Status : " + e);
 		};
 		req.request();
+		// req.
 		return promise;
 	}
 }

@@ -1,9 +1,8 @@
 package lib;
-import haxe.crypto.Sha224;
-import haxe.crypto.Sha1;
-import haxe.Log;
+import haxe.crypto.Sha256;
 import haxe.ds.StringMap;
 import hscript.*;
+using StringTools;
 class EvalHandler {
     public function new() {
 		interp = new Interp();
@@ -38,6 +37,7 @@ class EvalHandler {
         logs.push(tmp);
     }
     public function evaluate(s:String,?loc:StringMap<Dynamic>) {
+        @:privateAccess s = s.replace(Bot.getToken(),"").replace(Bot.getModioKey(),"");
         loadVars(interp.variables);
         if(loc != null){
             for(o in loc.keys()){

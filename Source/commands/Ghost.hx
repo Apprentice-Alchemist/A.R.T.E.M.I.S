@@ -14,7 +14,6 @@ class Ghost implements Command {
 	}
 	public function call(m:Message, b:Client) {
         var content = m.content;
-        trace(content);
 		var msg = content.substring((Bot.prefix + "ghost ").length,content.length);
 		m.delete();
         m.channel.send(msg).catchError(function(err){});

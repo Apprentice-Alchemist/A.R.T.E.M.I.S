@@ -5,9 +5,10 @@
 # --macro include("commands")
 --macro lib.Macro.include()
 # Libraries
--lib ModioHx
+
 -lib hscript
 -lib hxnodejs
+-lib ModioHx
 -lib discordjs
 
 -cp Source
