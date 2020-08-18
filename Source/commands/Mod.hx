@@ -12,7 +12,6 @@ class Mod implements Command {
 	public final longhelp:String;
 	public final hidden = true;
 	public var lastMessage:Message;
-	public var channel:Dynamic;
 
 	public function new() {
 		this.name = "mod";
@@ -24,7 +23,7 @@ class Mod implements Command {
 		CommandHandler.addCommand("mod", new Mod());
 	}
 
-	public function processMods(data:String) {
+	public function processMods(data:String, channel:TextChannel) {
 		try {
 			trace("Mods processed!");
 			var json = Json.parse(data);
@@ -48,16 +47,14 @@ class Mod implements Command {
 				channel.send({content: "No such mod : " + lastMessage.content.substr(lastMessage.content.indexOf(" "))});
 			}
 		} catch (e) {
-			trace(e.message);
+			channel.send(e.message);
 		}
 	}
 
 	public function call(m:Message, b:Client) {
-		channel = m.channel;
-
 		try @:privateAccess {
 			Modio.makeRequest("https://api.mod.io/v1/games/34/mods?api_key=" + Bot.getModioKey() + "&_q=" + m.content.substr(m.content.indexOf(" ")))
-				.then(processMods, function(e) {
+				.then(processMods.bind(_, m.channel), function(e) {
 					m.reply("Modio error" + "\n" + e);
 				});
 		} catch (e)

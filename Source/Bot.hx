@@ -1,5 +1,7 @@
 package;
 
+import discordjs.TextChannel;
+import discordjs.Channel;
 import haxe.Exception;
 import discordjs.Client;
 import discordjs.Message;
@@ -53,7 +55,10 @@ class Bot {
 		trace("Ready!");
 		trace("Invite link : " + bot.generateInvite(["ADMINISTATOR"]));
 	}
-	
+	public static function bork(err:Dynamic,ch:TextChannel){
+		ch.send("BORK BORK BORK! AN ERROR HAS OCCURED! <@525025580106907659>");
+		ch.send(err);
+	}
 	static function getToken() {
 		return JsonHandler.canRead("auth.json") ? JsonHandler.read("auth.json").token : Sys.getEnv("token").toString();
 	}

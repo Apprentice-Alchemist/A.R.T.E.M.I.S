@@ -26,16 +26,20 @@ class Bot {
 			}
 		});
 		Bot.bot.login(Bot.getToken()).then(function(e) {
-			haxe_Log.trace("Ready!",{ fileName : "Source/Bot.hx", lineNumber : 44, className : "Bot", methodName : "start"});
+			haxe_Log.trace("Ready!",{ fileName : "Source/Bot.hx", lineNumber : 46, className : "Bot", methodName : "start"});
 			Bot.startTime = new Date();
 		},function(e) {
-			haxe_Log.trace(e,{ fileName : "Source/Bot.hx", lineNumber : 47, className : "Bot", methodName : "start"});
+			haxe_Log.trace(e,{ fileName : "Source/Bot.hx", lineNumber : 49, className : "Bot", methodName : "start"});
 			haxe_Timer.delay(Bot.start,5000);
 		});
 	}
 	static onReady() {
-		haxe_Log.trace("Ready!",{ fileName : "Source/Bot.hx", lineNumber : 53, className : "Bot", methodName : "onReady"});
-		haxe_Log.trace("Invite link : " + Std.string(Bot.bot.generateInvite(["ADMINISTATOR"])),{ fileName : "Source/Bot.hx", lineNumber : 54, className : "Bot", methodName : "onReady"});
+		haxe_Log.trace("Ready!",{ fileName : "Source/Bot.hx", lineNumber : 55, className : "Bot", methodName : "onReady"});
+		haxe_Log.trace("Invite link : " + Std.string(Bot.bot.generateInvite(["ADMINISTATOR"])),{ fileName : "Source/Bot.hx", lineNumber : 56, className : "Bot", methodName : "onReady"});
+	}
+	static bork(err,ch) {
+		ch.send("BORK BORK BORK! AN ERROR HAS OCCURED! <@525025580106907659>");
+		ch.send(err);
 	}
 	static getToken() {
 		if(sys_FileSystem.exists("auth.json")) {
@@ -5341,10 +5345,10 @@ class commands_Ghost {
 	}
 	call(m,b) {
 		let content = m.content;
-		haxe_Log.trace(content,{ fileName : "Source/commands/Ghost.hx", lineNumber : 17, className : "commands.Ghost", methodName : "call"});
 		let msg = content.substring((Bot.prefix + "ghost ").length,content.length);
 		m.delete();
 		m.channel.send(msg).catch(function(err) {
+			Bot.bork(err,m.channel);
 		});
 	}
 }
@@ -5365,9 +5369,9 @@ class commands_Mod {
 		this.shorthelp = "Get a mod!";
 		this.longhelp = "Returns a mod, usage : `]mod mod_name`";
 	}
-	processMods(data) {
+	processMods(data,channel) {
 		try {
-			haxe_Log.trace("Mods processed!",{ fileName : "Source/commands/Mod.hx", lineNumber : 26, className : "commands.Mod", methodName : "processMods"});
+			haxe_Log.trace("Mods processed!",{ fileName : "Source/commands/Mod.hx", lineNumber : 28, className : "commands.Mod", methodName : "processMods"});
 			let json = new haxe_format_JsonParser(data).doParse();
 			let data1 = json.data;
 			if(json.result_count > 1) {
@@ -5378,7 +5382,7 @@ class commands_Mod {
 					let o = _g++;
 					b_b += Std.string(data1[o].name + "\n");
 				}
-				this.channel.send("There are multiple mods matching that input : \n" + b_b);
+				channel.send("There are multiple mods matching that input : \n" + b_b);
 			} else if(json.result_count == 1) {
 				let mod = data1[0];
 				let embed = new discordjs_MessageEmbed();
@@ -5386,25 +5390,30 @@ class commands_Mod {
 				embed.setTitle(mod.name);
 				embed.addField("Id",mod.id,true);
 				embed.setColor("BLUE");
-				this.channel.send(embed);
+				channel.send(embed);
 			} else {
-				haxe_Log.trace("Mod not found : " + HxOverrides.substr(this.lastMessage.content,this.lastMessage.content.indexOf(" "),null),{ fileName : "Source/commands/Mod.hx", lineNumber : 44, className : "commands.Mod", methodName : "processMods"});
-				this.channel.send({ content : "No such mod : " + HxOverrides.substr(this.lastMessage.content,this.lastMessage.content.indexOf(" "),null)});
+				haxe_Log.trace("Mod not found : " + HxOverrides.substr(this.lastMessage.content,this.lastMessage.content.indexOf(" "),null),{ fileName : "Source/commands/Mod.hx", lineNumber : 46, className : "commands.Mod", methodName : "processMods"});
+				channel.send(null,{ content : "No such mod : " + HxOverrides.substr(this.lastMessage.content,this.lastMessage.content.indexOf(" "),null)});
 			}
 		} catch( _g ) {
 			let e = haxe_Exception.caught(_g);
-			haxe_Log.trace(e.get_message(),{ fileName : "Source/commands/Mod.hx", lineNumber : 48, className : "commands.Mod", methodName : "processMods"});
+			channel.send(e.get_message());
 		}
 	}
 	call(m,b) {
-		this.channel = m.channel;
 		try {
-			lib_Modio.makeRequest("https://api.mod.io/v1/games/34/mods?api_key=" + Bot.getModioKey() + "&_q=" + HxOverrides.substr(m.content,m.content.indexOf(" "),null)).then($bind(this,this.processMods),function(e) {
+			let tmp = "https://api.mod.io/v1/games/34/mods?api_key=" + Bot.getModioKey() + "&_q=";
+			let _g = $bind(this,this.processMods);
+			let channel = m.channel;
+			let tmp1 = function(data) {
+				_g(data,channel);
+			};
+			lib_Modio.makeRequest(tmp + HxOverrides.substr(m.content,m.content.indexOf(" "),null)).then(tmp1,function(e) {
 				m.reply("Modio error" + "\n" + e);
 			});
 		} catch( _g ) {
 			let e = haxe_Exception.caught(_g);
-			haxe_Log.trace(e,{ fileName : "Source/commands/Mod.hx", lineNumber : 55, className : "commands.Mod", methodName : "call"});
+			haxe_Log.trace(e,{ fileName : "Source/commands/Mod.hx", lineNumber : 61, className : "commands.Mod", methodName : "call"});
 		}
 	}
 }
@@ -5418,7 +5427,6 @@ Object.assign(commands_Mod.prototype, {
 	,longhelp: null
 	,hidden: null
 	,lastMessage: null
-	,channel: null
 });
 class commands_Moderation {
 	constructor(type) {
@@ -5463,6 +5471,7 @@ class commands_Moderation {
 			break;
 		case "purge":
 			m.channel.bulkDelete(Std.parseInt(StringTools.rtrim(StringTools.ltrim(HxOverrides.substr(m.content,(Bot.prefix + "purge ").length,null)))),false).catch(function(e) {
+				Bot.bork(e,m.channel);
 			});
 			break;
 		case "softban":
@@ -5479,7 +5488,7 @@ class commands_Moderation {
 					if(e.kickable) {
 						let reason = HxOverrides.substr(m.content,m.content.indexOf(">"),null);
 						e.send("You were kicked from " + e.guild.name + " because : " + reason).catch(function(e) {
-							haxe_Log.trace(e,{ fileName : "Source/commands/Moderation.hx", lineNumber : 62, className : "commands.Moderation", methodName : "kick"});
+							haxe_Log.trace(e,{ fileName : "Source/commands/Moderation.hx", lineNumber : 65, className : "commands.Moderation", methodName : "kick"});
 						});
 						m.channel.send(e.name + " was kicked because :" + reason);
 						e.kick(reason);
@@ -5499,7 +5508,7 @@ class commands_Moderation {
 					if(e.bannable) {
 						let reason = HxOverrides.substr(m.content,m.content.indexOf(">") + 2,null);
 						e.send("You were banned from " + e.guild.name + " because : " + reason).catch(function(e) {
-							haxe_Log.trace(e,{ fileName : "Source/commands/Moderation.hx", lineNumber : 83, className : "commands.Moderation", methodName : "ban"});
+							haxe_Log.trace(e,{ fileName : "Source/commands/Moderation.hx", lineNumber : 86, className : "commands.Moderation", methodName : "ban"});
 						});
 						m.channel.send(e.name + " was banned because :" + reason);
 						e.ban(reason);
@@ -11439,25 +11448,24 @@ $hxClasses["lib.Logger"] = lib_Logger;
 lib_Logger.__name__ = "lib.Logger";
 class lib_Modio {
 	static makeRequest(full_path) {
-		let promise = new lib_TPromise();
-		let req = new haxe_http_HttpNodeJs(full_path);
-		req.addParameter("port","443");
-		req.onData = function(e) {
-			haxe_Log.trace("Modio Data",{ fileName : "Source/lib/Modio.hx", lineNumber : 24, className : "lib.Modio", methodName : "makeRequest"});
-			promise.resolve(e);
-		};
-		req.onError = function(e) {
-			haxe_Log.trace("Modio Error : " + e,{ fileName : "Source/lib/Modio.hx", lineNumber : 28, className : "lib.Modio", methodName : "makeRequest"});
-			promise.reject(e);
-		};
-		req.onStatus = function(e) {
-			haxe_Log.trace("Modio Status : " + e,{ fileName : "Source/lib/Modio.hx", lineNumber : 32, className : "lib.Modio", methodName : "makeRequest"});
-		};
-		req.request();
-		return promise;
+		return new Promise(function(resolve,reject) {
+			let req = new haxe_http_HttpNodeJs(full_path);
+			req.addParameter("port","443");
+			req.onData = function(e) {
+				haxe_Log.trace("Modio Data",{ fileName : "Source/lib/Modio.hx", lineNumber : 15, className : "lib.Modio", methodName : "makeRequest"});
+				resolve(e);
+			};
+			req.onError = function(e) {
+				haxe_Log.trace("Modio Error : " + e,{ fileName : "Source/lib/Modio.hx", lineNumber : 19, className : "lib.Modio", methodName : "makeRequest"});
+				reject(e);
+			};
+			req.onStatus = function(e) {
+				haxe_Log.trace("Modio Status : " + e,{ fileName : "Source/lib/Modio.hx", lineNumber : 23, className : "lib.Modio", methodName : "makeRequest"});
+			};
+			req.request();
+		});
 	}
 }
-lib_Modio.mods_json = null;
 $hxClasses["lib.Modio"] = lib_Modio;
 lib_Modio.__name__ = "lib.Modio";
 class lib_Settings {
@@ -11504,45 +11512,6 @@ lib_Settings._settings = null;
 $hxClasses["lib.Settings"] = lib_Settings;
 lib_Settings.__name__ = "lib.Settings";
 lib_Settings.__properties__ = {get__settings: "get__settings"};
-class lib_TPromise {
-	constructor() {
-		this.__rejections = [];
-		this.__resolves = [];
-	}
-	resolve(data) {
-		let _g = 0;
-		let _g1 = this.__resolves;
-		while(_g < _g1.length) {
-			let o = _g1[_g];
-			++_g;
-			o(data);
-		}
-	}
-	reject(err) {
-		let _g = 0;
-		let _g1 = this.__rejections;
-		while(_g < _g1.length) {
-			let o = _g1[_g];
-			++_g;
-			o(err);
-		}
-	}
-	then(onResolve,onReject) {
-		if(onResolve != null) {
-			this.__resolves.push(onResolve);
-		}
-		if(onReject != null) {
-			this.__rejections.push(onReject);
-		}
-	}
-}
-$hxClasses["lib.TPromise"] = lib_TPromise;
-lib_TPromise.__name__ = "lib.TPromise";
-Object.assign(lib_TPromise.prototype, {
-	__class__: lib_TPromise
-	,__resolves: null
-	,__rejections: null
-});
 class lib_UserService {
 }
 $hxClasses["lib.UserService"] = lib_UserService;
