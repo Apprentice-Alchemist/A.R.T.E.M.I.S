@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2  
+    - name: Setup    
+      uses: krdlab/setup-haxe@master
+      with:
+          haxe-version: latest
+    - name: Haxelibs
+      run: |
+        haxelib install hscript --quiet
+        haxelib install hxnodejs --quiet
+        haxelib git discordjs https://github.com/Apprentice-Alchemist/Haxe-DiscordJs --quiet
+        haxelib git ModioHx https://github.com/Apprentice-Alchemist/ModioHx --quiet
+    - name: Build
+      run: |
+       haxe build.hxml
